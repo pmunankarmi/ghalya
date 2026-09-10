@@ -41,6 +41,6 @@ Select the site logo under **Appearance → Customize → Site Identity**. The b
 
 The dedicated **Ghalya Home Page** template and every application, success, and terms page receive screen-specific ACF fields. Administrators edit plain text, labels, choices, and repeatable items such as benefits, FAQs, and terms sections. All HTML remains in the theme's `template-parts` files. English and Arabic pages keep independent content through Polylang.
 
-Header labels are editable under **Appearance → Ghalya content**. Gutenberg and the standard page content editor are disabled because this theme uses ACF as its page-editing interface.
+The separate **Appearance → Ghalya content** page is not used. Shared navigation labels use the theme's WordPress translation files, while the language switcher displays the native language name configured under **Languages → Languages**. Gutenberg and the standard page content editor are disabled because this theme uses ACF as its page-editing interface.
 
 Notification subjects support `{name}`, `{email}`, and `{submission_id}` tokens. The branded responsive email uses the Customizer site logo and sends an application summary to administrators plus an English or Arabic confirmation to the applicant.

@@ -271,27 +271,8 @@ function ghalya_register_acf_options()
     }
 
     acf_add_options_sub_page(array(
-        'page_title' => __('Ghalya theme content', 'ghalya'), 'menu_title' => __('Ghalya content', 'ghalya'),
-        'parent_slug' => 'themes.php', 'menu_slug' => 'ghalya-theme-content', 'capability' => 'edit_theme_options',
-    ));
-    acf_add_options_sub_page(array(
         'page_title' => __('Ghalya notification settings', 'ghalya'), 'menu_title' => __('Notifications', 'ghalya'),
         'parent_slug' => 'edit.php?post_type=ghalya_submission', 'menu_slug' => 'ghalya-email-settings', 'capability' => 'manage_options',
-    ));
-
-    acf_add_local_field_group(array(
-        'key' => 'group_ghalya_header_content', 'title' => __('Header labels', 'ghalya'),
-        'fields' => array(
-            array('key' => 'field_ghalya_nav_benefits_en', 'label' => __('Benefits label — English', 'ghalya'), 'name' => 'ghalya_nav_benefits_en', 'type' => 'text'),
-            array('key' => 'field_ghalya_nav_benefits_ar', 'label' => __('Benefits label — Arabic', 'ghalya'), 'name' => 'ghalya_nav_benefits_ar', 'type' => 'text'),
-            array('key' => 'field_ghalya_nav_faq_en', 'label' => __('FAQ label — English', 'ghalya'), 'name' => 'ghalya_nav_faq_en', 'type' => 'text'),
-            array('key' => 'field_ghalya_nav_faq_ar', 'label' => __('FAQ label — Arabic', 'ghalya'), 'name' => 'ghalya_nav_faq_ar', 'type' => 'text'),
-            array('key' => 'field_ghalya_nav_terms_en', 'label' => __('Terms label — English', 'ghalya'), 'name' => 'ghalya_nav_terms_en', 'type' => 'text'),
-            array('key' => 'field_ghalya_nav_terms_ar', 'label' => __('Terms label — Arabic', 'ghalya'), 'name' => 'ghalya_nav_terms_ar', 'type' => 'text'),
-            array('key' => 'field_ghalya_language_switch_en', 'label' => __('Language switch — English page', 'ghalya'), 'name' => 'ghalya_language_switch_en', 'type' => 'text'),
-            array('key' => 'field_ghalya_language_switch_ar', 'label' => __('Language switch — Arabic page', 'ghalya'), 'name' => 'ghalya_language_switch_ar', 'type' => 'text'),
-        ),
-        'location' => array(array(array('param' => 'options_page', 'operator' => '==', 'value' => 'ghalya-theme-content'))),
     ));
 
     acf_add_local_field_group(array(
@@ -320,22 +301,14 @@ function ghalya_register_acf_options()
 }
 add_action('acf/init', 'ghalya_register_acf_options');
 
-/** Seed global labels and notification copy without overwriting edits. */
-function ghalya_seed_acf_options()
+/** Seed notification copy without overwriting administrator edits. */
+function ghalya_seed_notification_options()
 {
     if (!function_exists('update_field')) {
         return;
     }
 
     $defaults = array(
-        'field_ghalya_nav_benefits_en' => array('ghalya_nav_benefits_en', 'Benefits'),
-        'field_ghalya_nav_benefits_ar' => array('ghalya_nav_benefits_ar', 'المزايا'),
-        'field_ghalya_nav_faq_en' => array('ghalya_nav_faq_en', 'FAQs'),
-        'field_ghalya_nav_faq_ar' => array('ghalya_nav_faq_ar', 'الأسئلة الشائعة'),
-        'field_ghalya_nav_terms_en' => array('ghalya_nav_terms_en', 'Terms'),
-        'field_ghalya_nav_terms_ar' => array('ghalya_nav_terms_ar', 'الشروط'),
-        'field_ghalya_language_switch_en' => array('ghalya_language_switch_en', 'العربية'),
-        'field_ghalya_language_switch_ar' => array('ghalya_language_switch_ar', 'English'),
         'field_ghalya_admin_notification_enabled' => array('ghalya_admin_notification_enabled', 1),
         'field_ghalya_email_subject' => array('ghalya_email_subject', 'New Ghalya creator application — {name}'),
         'field_ghalya_email_heading' => array('ghalya_email_heading', 'A new creator application has arrived'),
@@ -359,4 +332,4 @@ function ghalya_seed_acf_options()
         }
     }
 }
-add_action('acf/init', 'ghalya_seed_acf_options', 20);
+add_action('acf/init', 'ghalya_seed_notification_options', 20);

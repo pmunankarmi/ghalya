@@ -81,6 +81,30 @@ function ghalya_language_switch_url()
     return ghalya_page_url(ghalya_current_screen(), $other_language);
 }
 
+/** Return Polylang's configured native name for the other language. */
+function ghalya_language_switch_name()
+{
+    $other_language = ghalya_current_language() === 'ar' ? 'en' : 'ar';
+
+    if (function_exists('pll_the_languages')) {
+        $languages = pll_the_languages(array(
+            'raw' => 1,
+            'hide_if_empty' => 0,
+            'hide_if_no_translation' => 0,
+        ));
+
+        if (is_array($languages)) {
+            foreach ($languages as $language) {
+                if (($language['slug'] ?? '') === $other_language && !empty($language['name'])) {
+                    return (string) $language['name'];
+                }
+            }
+        }
+    }
+
+    return $other_language === 'ar' ? 'العربية' : 'English';
+}
+
 /**
  * Add the original screen classes so the converted CSS remains unchanged.
  */
@@ -113,21 +137,6 @@ function ghalya_body_classes($classes)
     return array_unique($classes);
 }
 add_filter('body_class', 'ghalya_body_classes');
-
-/**
- * Read a translated label from the ACF theme options page.
- */
-function ghalya_option_text($field_name)
-{
-    $language = ghalya_current_language();
-    $translated_name = $field_name . '_' . $language;
-
-    if (function_exists('get_field')) {
-        return (string) get_field($translated_name, 'option');
-    }
-
-    return (string) get_option('options_' . $translated_name, '');
-}
 
 /** Populate structured ACF fields once without overwriting later admin edits. */
 function ghalya_seed_page_content($page_id, $screen, $language)
