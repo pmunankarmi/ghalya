@@ -5,7 +5,10 @@ if (!defined('ABSPATH')) {
 }
 
 /**
- * Read and cache the latest public release from GitHub.
+ * Read the latest public release from GitHub.
+ *
+ * WordPress already caches theme-update checks. A second theme-specific cache
+ * would prevent the Dashboard's "Check again" action from seeing a new release.
  *
  * The release must contain an asset named ghalya-wordpress-theme.zip. Keeping
  * that filename stable ensures WordPress receives the correct theme folder.
@@ -13,13 +16,6 @@ if (!defined('ABSPATH')) {
  * @return array|false
  */
 function ghalya_get_latest_github_release() {
-    $cache_key = 'ghalya_latest_github_release';
-    $cached_release = get_site_transient($cache_key);
-
-    if (is_array($cached_release)) {
-        return $cached_release;
-    }
-
     $response = wp_remote_get(
         'https://api.github.com/repos/pmunankarmi/ghalya/releases/latest',
         array(
@@ -68,15 +64,11 @@ function ghalya_get_latest_github_release() {
         return false;
     }
 
-    $release_data = array(
+    return array(
         'version' => $version,
         'url' => esc_url_raw($release['html_url'] ?? 'https://github.com/pmunankarmi/ghalya/releases'),
         'package' => $package_url,
     );
-
-    set_site_transient($cache_key, $release_data, 6 * HOUR_IN_SECONDS);
-
-    return $release_data;
 }
 
 /**
@@ -114,24 +106,3 @@ function ghalya_filter_github_theme_update($update, $theme_data, $stylesheet, $l
     );
 }
 add_filter('update_themes_github.com', 'ghalya_filter_github_theme_update', 10, 4);
-
-/**
- * Remove cached release details after this theme has been upgraded.
- *
- * @param WP_Upgrader $upgrader   WordPress upgrader instance.
- * @param array       $hook_extra Upgrade context.
- */
-function ghalya_clear_github_release_cache($upgrader, $hook_extra) {
-    unset($upgrader);
-
-    if ('theme' !== ($hook_extra['type'] ?? '') || 'update' !== ($hook_extra['action'] ?? '')) {
-        return;
-    }
-
-    $themes = isset($hook_extra['themes']) ? (array) $hook_extra['themes'] : array();
-
-    if (in_array(get_stylesheet(), $themes, true)) {
-        delete_site_transient('ghalya_latest_github_release');
-    }
-}
-add_action('upgrader_process_complete', 'ghalya_clear_github_release_cache', 10, 2);
