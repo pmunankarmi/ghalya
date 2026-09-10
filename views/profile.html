@@ -1,0 +1,236 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Your profile · Ghalya</title>
+    <link href="assets/vendor/bootstrap.min.css" rel="stylesheet" />
+    <link href="assets/vendor/aos.css" rel="stylesheet" />
+    <link href="assets/css/mt-style.css?v=20260910" rel="stylesheet" />
+  </head>
+  <body class="mt-application-page mt-step-1">
+    <!-- Site header -->
+    <header class="mt-site-header">
+      <nav class="navbar">
+        <div class="container">
+          <a class="mt-brand" href="index.html">
+            <img src="assets/images/ghalya-logo.png" alt="Ghalya" />
+          </a>
+          <div class="d-flex align-items-center gap-3">
+            <a class="mt-nav-link d-none d-sm-inline" href="terms.html">
+              Terms
+            </a>
+            <a class="mt-lang-link" href="profile-ar.html">العربية</a>
+          </div>
+        </div>
+      </nav>
+    </header>
+    <!-- Main content -->
+    <main class="mt-form-page">
+      <div class="container">
+        <div class="mt-form-layout">
+          <!-- Application progress -->
+          <aside class="mt-form-aside" data-aos="fade-up">
+            <h2>Your Ghalya application</h2>
+            <p>
+              Tell us about your audience, work, and availability. It only takes
+              a few minutes.
+            </p>
+            <ol class="mt-progress-list">
+              <li class="mt-progress-item mt-is-active">
+                <span class="mt-progress-number">1</span>
+                <span>Profile</span>
+              </li>
+              <li class="mt-progress-item">
+                <span class="mt-progress-number">2</span>
+                <span>Tier</span>
+              </li>
+              <li class="mt-progress-item">
+                <span class="mt-progress-number">3</span>
+                <span>Work</span>
+              </li>
+              <li class="mt-progress-item">
+                <span class="mt-progress-number">4</span>
+                <span>Proposal</span>
+              </li>
+              <li class="mt-progress-item">
+                <span class="mt-progress-number">5</span>
+                <span>Contact</span>
+              </li>
+            </ol>
+          </aside>
+          <!-- Current application step -->
+          <form
+            action="tier.html"
+            class="mt-form-card mt-js-form"
+            data-aos="fade-up"
+            data-aos-delay="80"
+            data-mt-next="tier.html"
+            method="get"
+          >
+            <div class="mt-form-top">
+              <a class="mt-back-link" href="index.html">Back home</a>
+              <span class="mt-step-label">Step 1 of 5</span>
+            </div>
+            <h1 class="mt-form-title">Your profile</h1>
+            <p class="mt-form-intro">
+              Start with the basics so we can match you with the right campaign
+              tier.
+            </p>
+            <div class="row g-3">
+              <div class="col-md-6">
+                <div class="mt-field">
+                  <label class="mt-label" for="full-name">Full Name</label>
+                  <input
+                    class="mt-input"
+                    id="full-name"
+                    name="full_name"
+                    required
+                    type="text"
+                    placeholder="Firstname Lastname"
+                  />
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="mt-field">
+                  <label class="mt-label" for="instagram">
+                    Instagram Handle
+                  </label>
+                  <input
+                    class="mt-input"
+                    id="instagram"
+                    name="instagram"
+                    required
+                    type="text"
+                    placeholder="@instagramhandle"
+                  />
+                </div>
+              </div>
+            </div>
+            <div class="mt-field">
+              <span class="mt-label">Followers</span>
+              <div class="mt-chip-row">
+                <input
+                  class="mt-choice-input"
+                  id="followers-1"
+                  name="followers"
+                  required
+                  type="radio"
+                  value="1-10K"
+                />
+                <label class="mt-choice" for="followers-1">1–10K</label>
+                <input
+                  class="mt-choice-input"
+                  id="followers-2"
+                  name="followers"
+                  type="radio"
+                  value="10K-50K"
+                />
+                <label class="mt-choice" for="followers-2">10K–50K</label>
+                <input
+                  class="mt-choice-input"
+                  id="followers-3"
+                  name="followers"
+                  type="radio"
+                  value="50K-500K"
+                />
+                <label class="mt-choice" for="followers-3">50K–500K</label>
+                <input
+                  class="mt-choice-input"
+                  id="followers-4"
+                  name="followers"
+                  type="radio"
+                  value="500K+"
+                />
+                <label class="mt-choice" for="followers-4">500K+</label>
+              </div>
+            </div>
+            <div class="mt-field">
+              <label class="mt-label" for="city">City</label>
+              <select class="mt-select" id="city" name="city" required>
+                <option value="" selected disabled>Select city</option>
+                <option value="Riyadh">Riyadh</option>
+                <option value="Jeddah">Jeddah</option>
+                <option value="Dammam">Dammam</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+            <div class="mt-field">
+              <span class="mt-label">Content category</span>
+              <div class="mt-chip-row">
+                <input
+                  class="mt-choice-input"
+                  id="cat-food"
+                  name="content_categories"
+                  required
+                  type="checkbox"
+                  value="Food"
+                />
+                <label class="mt-choice" for="cat-food">Food</label>
+                <input
+                  class="mt-choice-input"
+                  id="cat-travel"
+                  name="content_categories"
+                  type="checkbox"
+                  value="Travel"
+                />
+                <label class="mt-choice" for="cat-travel">Travel</label>
+                <input
+                  class="mt-choice-input"
+                  id="cat-chefs"
+                  name="content_categories"
+                  type="checkbox"
+                  value="Chefs"
+                />
+                <label class="mt-choice" for="cat-chefs">Chefs</label>
+                <input
+                  class="mt-choice-input"
+                  id="cat-deals"
+                  name="content_categories"
+                  type="checkbox"
+                  value="Offers and Deals"
+                />
+                <label class="mt-choice" for="cat-deals">
+                  Offers &amp; Deals
+                </label>
+                <input
+                  class="mt-choice-input"
+                  id="cat-beauty"
+                  name="content_categories"
+                  type="checkbox"
+                  value="Beauty"
+                />
+                <label class="mt-choice" for="cat-beauty">Beauty</label>
+                <input
+                  class="mt-choice-input"
+                  id="cat-fitness"
+                  name="content_categories"
+                  type="checkbox"
+                  value="Fitness"
+                />
+                <label class="mt-choice" for="cat-fitness">Fitness</label>
+                <input
+                  class="mt-choice-input"
+                  id="cat-life"
+                  name="content_categories"
+                  type="checkbox"
+                  value="Lifestyle"
+                />
+                <label class="mt-choice" for="cat-life">Lifestyle</label>
+              </div>
+            </div>
+            <div class="mt-form-actions">
+              <a class="mt-btn-secondary" href="index.html">Cancel</a>
+              <button class="mt-btn-primary" type="submit">Next</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </main>
+    <!-- Page scripts -->
+    <script src="assets/vendor/jquery.js?v=20260910"></script>
+    <script src="assets/vendor/jquery.validate.js?v=20260910"></script>
+    <script src="assets/vendor/aos.js?v=20260910"></script>
+    <script src="assets/js/mt-app.js?v=20260911"></script>
+  </body>
+</html>
