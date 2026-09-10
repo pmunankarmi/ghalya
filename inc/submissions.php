@@ -114,41 +114,128 @@ function ghalya_readable_label($value)
     return ucwords(str_replace(array('_', '-'), ' ', (string) $value));
 }
 
-function ghalya_format_application_email($application)
+function ghalya_notification_option($name, $default = '')
 {
-    $lines = array();
+    $stored_value = get_option('options_' . $name, null);
 
-    foreach ($application as $step => $fields) {
-        if (!is_array($fields)) {
-            continue;
-        }
-
-        $lines[] = ghalya_readable_label($step);
-        $lines[] = str_repeat('-', 44);
-
-        foreach ($fields as $name => $value) {
-            if (is_array($value)) {
-                $value = implode(', ', array_map('strval', $value));
-            }
-
-            $lines[] = ghalya_readable_label($name) . ': ' . (string) $value;
-        }
-
-        $lines[] = '';
+    if ($stored_value === null) {
+        return $default;
     }
 
-    return implode("\n", $lines);
+    if (function_exists('get_field')) {
+        return get_field($name, 'option');
+    }
+
+    return $stored_value;
+}
+
+function ghalya_notification_tokens($text, $submission_id, $full_name, $email)
+{
+    return strtr((string) $text, array(
+        '{name}' => $full_name,
+        '{email}' => $email,
+        '{submission_id}' => (string) $submission_id,
+    ));
+}
+
+function ghalya_email_logo_url()
+{
+    $logo_id = get_theme_mod('custom_logo');
+    $logo_url = $logo_id ? wp_get_attachment_image_url($logo_id, 'full') : '';
+
+    return $logo_url ? $logo_url : ghalya_asset_url('images/ghalya-logo.png');
+}
+
+function ghalya_render_application_email($args)
+{
+    $template_path = GHALYA_THEME_PATH . '/template-parts/email/notification.php';
+
+    if (!is_readable($template_path)) {
+        return '';
+    }
+
+    ob_start();
+    include $template_path;
+    return (string) ob_get_clean();
+}
+
+function ghalya_notification_headers($reply_to = '')
+{
+    $headers = array('Content-Type: text/html; charset=UTF-8');
+    $from_name = sanitize_text_field((string) ghalya_notification_option('ghalya_email_from_name', 'Ghalya Creator Program'));
+    $from_address = sanitize_email((string) ghalya_notification_option('ghalya_email_from_address', ''));
+
+    if ($from_address !== '') {
+        $headers[] = 'From: ' . $from_name . ' <' . $from_address . '>';
+    }
+
+    if (is_email($reply_to)) {
+        $headers[] = 'Reply-To: ' . $reply_to;
+    }
+
+    return $headers;
 }
 
 function ghalya_submission_recipient()
 {
-    $recipient = '';
-
-    if (function_exists('get_field')) {
-        $recipient = (string) get_field('ghalya_submission_email', 'option');
-    }
+    $recipient = (string) ghalya_notification_option('ghalya_submission_email', '');
 
     return is_email($recipient) ? $recipient : get_option('admin_email');
+}
+
+function ghalya_send_submission_notifications($post_id, $application, $language, $full_name, $email)
+{
+    $admin_enabled = (bool) ghalya_notification_option('ghalya_admin_notification_enabled', 1);
+    $applicant_enabled = (bool) ghalya_notification_option('ghalya_applicant_notification_enabled', 1);
+    $footer = (string) ghalya_notification_option('ghalya_email_footer_' . $language, '');
+
+    if ($admin_enabled) {
+        $subject = ghalya_notification_tokens(
+            ghalya_notification_option('ghalya_email_subject', 'New Ghalya creator application — {name}'),
+            $post_id,
+            $full_name,
+            $email
+        );
+        $admin_email = ghalya_render_application_email(array(
+            'language' => 'en',
+            'logo_url' => ghalya_email_logo_url(),
+            'heading' => ghalya_notification_option('ghalya_email_heading', 'A new creator application has arrived'),
+            'message' => ghalya_notification_option('ghalya_email_intro', ''),
+            'footer' => ghalya_notification_option('ghalya_email_footer_en', $footer),
+            'application' => $application,
+            'show_details' => true,
+            'button_url' => admin_url('post.php?post=' . absint($post_id) . '&action=edit'),
+            'button_label' => ghalya_notification_option('ghalya_email_review_button', 'Review application'),
+        ));
+        $admin_sent = wp_mail(ghalya_submission_recipient(), $subject, $admin_email, ghalya_notification_headers($email));
+        update_post_meta($post_id, '_ghalya_mail_status', $admin_sent ? 'sent' : 'failed');
+    } else {
+        update_post_meta($post_id, '_ghalya_mail_status', 'disabled');
+    }
+
+    if ($applicant_enabled) {
+        $subject = ghalya_notification_tokens(
+            ghalya_notification_option('ghalya_applicant_email_subject_' . $language, ''),
+            $post_id,
+            $full_name,
+            $email
+        );
+        $applicant_email = ghalya_render_application_email(array(
+            'language' => $language,
+            'logo_url' => ghalya_email_logo_url(),
+            'heading' => ghalya_notification_option('ghalya_applicant_email_heading_' . $language, ''),
+            'message' => ghalya_notification_option('ghalya_applicant_email_message_' . $language, ''),
+            'footer' => $footer,
+            'application' => array(),
+            'show_details' => false,
+            'button_url' => '',
+            'button_label' => '',
+        ));
+        $applicant_sent = wp_mail($email, $subject, $applicant_email, ghalya_notification_headers());
+        update_post_meta($post_id, '_ghalya_applicant_mail_status', $applicant_sent ? 'sent' : 'failed');
+    } else {
+        update_post_meta($post_id, '_ghalya_applicant_mail_status', 'disabled');
+    }
 }
 
 function ghalya_handle_application_submission()
@@ -203,16 +290,7 @@ function ghalya_handle_application_submission()
     update_post_meta($post_id, '_ghalya_phone', $phone);
     update_post_meta($post_id, 'ghalya_status', 'new');
 
-    $subject = 'New Ghalya creator application';
-
-    if (function_exists('get_field')) {
-        $custom_subject = trim((string) get_field('ghalya_email_subject', 'option'));
-        $subject = $custom_subject !== '' ? $custom_subject : $subject;
-    }
-
-    $headers = array('Content-Type: text/plain; charset=UTF-8', 'Reply-To: ' . $email);
-    $mail_sent = wp_mail(ghalya_submission_recipient(), $subject, ghalya_format_application_email($application), $headers);
-    update_post_meta($post_id, '_ghalya_mail_status', $mail_sent ? 'sent' : 'failed');
+    ghalya_send_submission_notifications($post_id, $application, $language, $full_name, $email);
 
     // The application is safely stored in WordPress, so its browser copy can be removed.
     setcookie('mt_ghalya_application', '', array(
@@ -270,7 +348,8 @@ function ghalya_submission_columns($columns)
         'ghalya_phone' => __('Phone', 'ghalya'),
         'ghalya_language' => __('Language', 'ghalya'),
         'ghalya_status' => __('Status', 'ghalya'),
-        'ghalya_mail' => __('Email delivery', 'ghalya'),
+        'ghalya_mail' => __('Admin email', 'ghalya'),
+        'ghalya_confirmation' => __('Applicant email', 'ghalya'),
         'date' => __('Submitted', 'ghalya'),
     );
 }
@@ -284,6 +363,7 @@ function ghalya_submission_column_value($column, $post_id)
         'ghalya_language' => '_ghalya_language',
         'ghalya_status' => 'ghalya_status',
         'ghalya_mail' => '_ghalya_mail_status',
+        'ghalya_confirmation' => '_ghalya_applicant_mail_status',
     );
 
     if (isset($meta_keys[$column])) {
@@ -346,7 +426,7 @@ function ghalya_export_submissions()
 
     $output = fopen('php://output', 'w');
     fwrite($output, "\xEF\xBB\xBF");
-    fputcsv($output, array('ID', 'Submitted', 'Status', 'Language', 'Full name', 'Email', 'Phone', 'Instagram handle', 'Followers', 'City', 'Categories', 'Instagram URL', 'TikTok URL', 'Snapchat', 'Previous content', 'Brands', 'Availability', 'Mail status', 'Reviewer notes'));
+    fputcsv($output, array('ID', 'Submitted', 'Status', 'Language', 'Full name', 'Email', 'Phone', 'Instagram handle', 'Followers', 'City', 'Categories', 'Instagram URL', 'TikTok URL', 'Snapchat', 'Previous content', 'Brands', 'Availability', 'Admin mail status', 'Applicant mail status', 'Reviewer notes'));
 
     foreach ($submissions as $submission) {
         $application = get_post_meta($submission->ID, '_ghalya_application', true);
@@ -372,6 +452,7 @@ function ghalya_export_submissions()
             ghalya_export_value($application, $language, 4, 'brands'),
             ghalya_export_value($application, $language, 4, 'availability'),
             get_post_meta($submission->ID, '_ghalya_mail_status', true),
+            get_post_meta($submission->ID, '_ghalya_applicant_mail_status', true),
             get_post_meta($submission->ID, 'ghalya_reviewer_notes', true),
         ));
     }

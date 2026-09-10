@@ -129,122 +129,74 @@ function ghalya_option_text($field_name)
     return (string) get_option('options_' . $translated_name, '');
 }
 
-/**
- * Read the original supplied design once when seeding a page's ACF content.
- */
-function ghalya_default_page_markup($screen, $language)
-{
-    $source_name = $screen === 'home' ? 'index' : $screen;
-    $source_name .= $language === 'ar' ? '-ar.html' : '.html';
-    $source_path = GHALYA_THEME_PATH . '/content-seed/' . $source_name;
-
-    if (!is_readable($source_path)) {
-        return '';
-    }
-
-    $source = file_get_contents($source_path);
-    return preg_match('~<main\b[^>]*>.*?</main>~s', $source, $matches) ? $matches[0] : '';
-}
-
-/**
- * Populate a page's ACF field without overwriting later admin edits.
- */
+/** Populate structured ACF fields once without overwriting later admin edits. */
 function ghalya_seed_page_content($page_id, $screen, $language)
 {
-    if (get_post_meta($page_id, 'ghalya_page_markup', true) !== '') {
-        return;
+    $seed_key = '_ghalya_plain_content_seeded_' . $screen;
+
+    if (get_post_meta($page_id, $seed_key, true) || !function_exists('update_field')) {
+        return false;
     }
 
-    $markup = ghalya_default_page_markup($screen, $language);
+    $existing_content = function_exists('get_field') ? get_field('ghalya_' . $screen . '_content', $page_id) : false;
 
-    if ($markup === '') {
-        return;
+    if (is_array($existing_content) && array_filter($existing_content)) {
+        update_post_meta($page_id, $seed_key, GHALYA_THEME_VERSION);
+        return false;
     }
 
-    update_post_meta($page_id, 'ghalya_page_markup', $markup);
-    update_post_meta($page_id, '_ghalya_page_markup', 'field_ghalya_page_markup');
+    $content = ghalya_default_content($screen, $language);
+
+    if (!$content) {
+        return false;
+    }
+
+    update_field('field_ghalya_' . $screen . '_content', $content, $page_id);
+    update_post_meta($page_id, $seed_key, GHALYA_THEME_VERSION);
+
+    return true;
 }
 
-/**
- * Render the matching static view through WordPress URLs and security fields.
- */
-function ghalya_render_screen($screen)
+/** Return the current page's structured content with a safe first-run fallback. */
+function ghalya_screen_content($screen)
 {
-    $language = ghalya_current_language();
+    $content = array();
     $page_id = get_queried_object_id();
-    $content = '';
 
     if (function_exists('get_field')) {
-        $content = (string) get_field('ghalya_page_markup', $page_id, false);
+        $content = get_field('ghalya_' . $screen . '_content', $page_id);
     }
 
-    if ($content === '') {
-        $content = (string) get_post_meta($page_id, 'ghalya_page_markup', true);
-    }
+    return is_array($content) && $content ? $content : ghalya_default_content($screen, ghalya_current_language());
+}
 
-    if ($content === '') {
-        echo '<main class="mt-form-page"><div class="container"><p>';
-        esc_html_e('Add this page’s content in the Ghalya Page Content fields.', 'ghalya');
-        echo '</p></div></main>';
+function ghalya_content_text($content, $key)
+{
+    return isset($content[$key]) && !is_array($content[$key]) ? (string) $content[$key] : '';
+}
+
+function ghalya_content_rows($content, $key)
+{
+    return isset($content[$key]) && is_array($content[$key]) ? $content[$key] : array();
+}
+
+function ghalya_asset_url($path)
+{
+    return GHALYA_THEME_URI . '/assets/' . ltrim($path, '/');
+}
+
+/** Render HTML from theme-owned template parts and plain ACF values. */
+function ghalya_render_screen($screen)
+{
+    $allowed = array('home', 'profile', 'tier', 'work', 'proposal', 'contact', 'success', 'terms');
+
+    if (!in_array($screen, $allowed, true)) {
         return;
     }
 
-    $asset_url = GHALYA_THEME_URI . '/assets/';
-    $content = str_replace(
-        array('src="assets/', 'href="assets/'),
-        array('src="' . esc_url($asset_url), 'href="' . esc_url($asset_url)),
-        $content
-    );
-
-    $screens = array('index' => 'home', 'profile' => 'profile', 'tier' => 'tier', 'work' => 'work', 'proposal' => 'proposal', 'contact' => 'contact', 'success' => 'success', 'terms' => 'terms');
-
-    foreach ($screens as $file_name => $target_screen) {
-        foreach (array('en', 'ar') as $target_language) {
-            $static_file = $file_name . ($target_language === 'ar' ? '-ar' : '') . '.html';
-            $target_url = esc_url(ghalya_page_url($target_screen, $target_language));
-
-            $content = str_replace(
-                array(
-                    'href="' . $static_file . '"',
-                    'action="' . $static_file . '"',
-                    'data-mt-next="' . $static_file . '"',
-                ),
-                array(
-                    'href="' . $target_url . '"',
-                    'action="' . $target_url . '"',
-                    'data-mt-next="' . $target_url . '"',
-                ),
-                $content
-            );
-        }
-    }
-
-    if ($screen === 'contact') {
-        $content = str_replace(
-            'action="sendmail.php"',
-            'action="' . esc_url(admin_url('admin-post.php')) . '"',
-            $content
-        );
-
-        $security_fields = '<input type="hidden" name="action" value="ghalya_submit_application">';
-        $security_fields .= wp_nonce_field('ghalya_submit_application', '_ghalya_nonce', true, false);
-
-        $content = preg_replace_callback(
-            '~<form\b(?=[^>]*\bdata-mt-sendmail\b)[^>]*>~s',
-            function ($form_match) use ($security_fields) {
-                return $form_match[0] . $security_fields;
-            },
-            $content,
-            1
-        );
-
-        if (!empty($_GET['submission_error'])) {
-            $message = ghalya_submission_error_message(sanitize_key(wp_unslash($_GET['submission_error'])));
-            $notice = '<div class="container"><div class="mt-form-card mt-submission-notice" role="alert">' . esc_html($message) . '</div></div>';
-            $content = preg_replace('~(<main\b[^>]*>)~', '$1' . $notice, $content, 1);
-        }
-    }
-
-    // Page markup is entered by trusted administrators through ACF.
-    echo $content; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+    $template = in_array($screen, array('profile', 'tier', 'work', 'proposal', 'contact'), true) ? 'application' : $screen;
+    get_template_part('template-parts/screens/' . $template, null, array(
+        'screen' => $screen,
+        'content' => ghalya_screen_content($screen),
+    ));
 }

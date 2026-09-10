@@ -144,6 +144,10 @@ add_action('admin_init', 'ghalya_link_polylang_pages');
  */
 function ghalya_upgrade_theme_pages()
 {
+    if (!function_exists('update_field')) {
+        return;
+    }
+
     if (get_option('ghalya_theme_data_version') === GHALYA_THEME_VERSION) {
         return;
     }
@@ -171,6 +175,23 @@ function ghalya_upgrade_theme_pages()
     update_option('ghalya_theme_data_version', GHALYA_THEME_VERSION, false);
 }
 add_action('admin_init', 'ghalya_upgrade_theme_pages');
+
+/** Seed structured page fields when ACF Pro becomes available after activation. */
+function ghalya_seed_all_page_content()
+{
+    $page_ids = get_option('ghalya_page_ids', array());
+
+    foreach (array('en', 'ar') as $language) {
+        foreach (array('home', 'profile', 'tier', 'work', 'proposal', 'contact', 'success', 'terms') as $screen) {
+            $page_id = isset($page_ids[$language][$screen]) ? absint($page_ids[$language][$screen]) : 0;
+
+            if ($page_id && get_post_status($page_id)) {
+                ghalya_seed_page_content($page_id, $screen, $language);
+            }
+        }
+    }
+}
+add_action('acf/init', 'ghalya_seed_all_page_content', 30);
 
 function ghalya_dependency_notice()
 {

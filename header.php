@@ -15,7 +15,7 @@ $ghalya_is_landing = $ghalya_screen === 'home';
     <header class="mt-site-header">
       <nav class="navbar<?php echo $ghalya_is_landing ? ' navbar-expand-lg' : ''; ?>">
         <div class="container">
-          <a class="mt-brand" href="<?php echo esc_url(ghalya_page_url('home', $ghalya_language)); ?>" aria-label="<?php esc_attr_e('Ghalya home', 'ghalya'); ?>">
+          <a class="mt-brand" href="<?php echo esc_url(ghalya_page_url('home', $ghalya_language)); ?>" aria-label="<?php echo esc_attr(get_bloginfo('name')); ?>">
             <?php
             $ghalya_logo_id = get_theme_mod('custom_logo');
 
@@ -26,7 +26,7 @@ $ghalya_is_landing = $ghalya_screen === 'home';
                 ));
             } else {
                 ?>
-                <img src="<?php echo esc_url(GHALYA_THEME_URI . '/assets/images/ghalya-logo.png'); ?>" alt="Ghalya" />
+                <img src="<?php echo esc_url(GHALYA_THEME_URI . '/assets/images/ghalya-logo.png'); ?>" alt="<?php echo esc_attr(get_bloginfo('name')); ?>" />
                 <?php
             }
             ?>

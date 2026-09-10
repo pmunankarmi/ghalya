@@ -286,7 +286,7 @@
       field.appendChild(input);
       container.appendChild(field);
 
-      // Register the new optional URL with the active validator.
+      // Register the additional URL with the active validator.
       if (
         typeof window.jQuery !== "undefined" &&
         typeof window.jQuery.fn.validate === "function"
