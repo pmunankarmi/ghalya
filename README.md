@@ -26,5 +26,10 @@ Use **Export CSV** above the submissions table to download all records. The expo
 
 ## Content editing
 
-The Ghalya landing template exposes its hero title, highlighted word, description, and join-button label through ACF. Leave a field blank to retain the supplied design copy. English and Arabic landing pages keep independent field values through Polylang.
+Select the site logo under **Appearance → Customize → Site Identity**. The bundled Ghalya logo remains as the fallback until a custom logo is selected.
 
+The dedicated **Ghalya Home Page** template and every application, success, and terms page receive a **Ghalya Page Content** ACF field. The installer imports the supplied design into that field once; front-end templates then read the saved ACF value rather than hardcoded page copy. English and Arabic pages keep independent content through Polylang.
+
+Header labels are editable under **Appearance → Ghalya content**. Gutenberg and the standard page content editor are disabled because this theme uses ACF as its page-editing interface.
+
+The original supplied HTML is stored under `content-seed/` only for first-time page population. Runtime templates do not read hardcoded page copy; they render each page's saved ACF content.

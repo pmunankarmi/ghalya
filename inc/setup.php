@@ -9,9 +9,34 @@ function ghalya_theme_setup()
     load_theme_textdomain('ghalya', GHALYA_THEME_PATH . '/languages');
     add_theme_support('title-tag');
     add_theme_support('post-thumbnails');
+    add_theme_support('custom-logo', array(
+        'height' => 80,
+        'width' => 220,
+        'flex-height' => true,
+        'flex-width' => true,
+        'unlink-homepage-logo' => false,
+    ));
     add_theme_support('html5', array('search-form', 'gallery', 'caption', 'style', 'script'));
 }
 add_action('after_setup_theme', 'ghalya_theme_setup');
+
+/**
+ * This theme uses ACF for page editing, so the block editor is not required.
+ */
+function ghalya_disable_block_editor($can_edit, $post_type = '')
+{
+    return false;
+}
+add_filter('use_block_editor_for_post', 'ghalya_disable_block_editor', 10, 2);
+add_filter('use_block_editor_for_post_type', 'ghalya_disable_block_editor', 10, 2);
+add_filter('gutenberg_can_edit_post_type', 'ghalya_disable_block_editor', 10, 2);
+add_filter('use_widgets_block_editor', '__return_false');
+
+function ghalya_remove_page_content_editor()
+{
+    remove_post_type_support('page', 'editor');
+}
+add_action('init', 'ghalya_remove_page_content_editor', 100);
 
 function ghalya_enqueue_assets()
 {
@@ -37,7 +62,7 @@ add_action('wp_enqueue_scripts', 'ghalya_enqueue_assets');
 function ghalya_create_required_pages()
 {
     $definitions = array(
-        'home' => array('template' => 'templates/landing.php', 'en' => array('Ghalya Creator Program', 'ghalya'), 'ar' => array('برنامج صناع المحتوى من غالية', 'ghalya-ar')),
+        'home' => array('template' => 'templates/home.php', 'en' => array('Ghalya Creator Program', 'ghalya'), 'ar' => array('برنامج صناع المحتوى من غالية', 'ghalya-ar')),
         'profile' => array('template' => 'templates/application.php', 'en' => array('Your Profile', 'profile'), 'ar' => array('ملفك الشخصي', 'profile-ar')),
         'tier' => array('template' => 'templates/application.php', 'en' => array('Your Tier', 'tier'), 'ar' => array('فئتك', 'tier-ar')),
         'work' => array('template' => 'templates/application.php', 'en' => array('Your Work', 'work'), 'ar' => array('أعمالك', 'work-ar')),
@@ -74,6 +99,7 @@ function ghalya_create_required_pages()
                 update_post_meta($existing_id, '_wp_page_template', $definition['template']);
                 update_post_meta($existing_id, '_ghalya_screen', $screen);
                 update_post_meta($existing_id, '_ghalya_language', $language);
+                ghalya_seed_page_content($existing_id, $screen, $language);
                 $page_ids[$language][$screen] = (int) $existing_id;
 
                 if (function_exists('pll_set_post_language')) {
@@ -112,6 +138,39 @@ function ghalya_link_polylang_pages()
     }
 }
 add_action('admin_init', 'ghalya_link_polylang_pages');
+
+/**
+ * Move existing landing pages to the dedicated Home template once per release.
+ */
+function ghalya_upgrade_theme_pages()
+{
+    if (get_option('ghalya_theme_data_version') === GHALYA_THEME_VERSION) {
+        return;
+    }
+
+    $page_ids = get_option('ghalya_page_ids', array());
+
+    foreach (array('en', 'ar') as $language) {
+        $home_id = isset($page_ids[$language]['home']) ? absint($page_ids[$language]['home']) : 0;
+
+        if ($home_id && get_post_status($home_id)) {
+            update_post_meta($home_id, '_wp_page_template', 'templates/home.php');
+        }
+    }
+
+    foreach (array('en', 'ar') as $language) {
+        foreach (array('home', 'profile', 'tier', 'work', 'proposal', 'contact', 'success', 'terms') as $screen) {
+            $page_id = isset($page_ids[$language][$screen]) ? absint($page_ids[$language][$screen]) : 0;
+
+            if ($page_id && get_post_status($page_id)) {
+                ghalya_seed_page_content($page_id, $screen, $language);
+            }
+        }
+    }
+
+    update_option('ghalya_theme_data_version', GHALYA_THEME_VERSION, false);
+}
+add_action('admin_init', 'ghalya_upgrade_theme_pages');
 
 function ghalya_dependency_notice()
 {

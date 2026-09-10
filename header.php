@@ -16,17 +16,29 @@ $ghalya_is_landing = $ghalya_screen === 'home';
       <nav class="navbar<?php echo $ghalya_is_landing ? ' navbar-expand-lg' : ''; ?>">
         <div class="container">
           <a class="mt-brand" href="<?php echo esc_url(ghalya_page_url('home', $ghalya_language)); ?>" aria-label="<?php esc_attr_e('Ghalya home', 'ghalya'); ?>">
-            <img src="<?php echo esc_url(GHALYA_THEME_URI . '/assets/images/ghalya-logo.png'); ?>" alt="Ghalya" />
+            <?php
+            $ghalya_logo_id = get_theme_mod('custom_logo');
+
+            if ($ghalya_logo_id) {
+                echo wp_get_attachment_image($ghalya_logo_id, 'full', false, array(
+                    'class' => 'custom-logo',
+                    'alt' => get_bloginfo('name'),
+                ));
+            } else {
+                ?>
+                <img src="<?php echo esc_url(GHALYA_THEME_URI . '/assets/images/ghalya-logo.png'); ?>" alt="Ghalya" />
+                <?php
+            }
+            ?>
           </a>
           <div class="d-flex align-items-center <?php echo $ghalya_is_landing ? 'gap-4' : 'gap-3'; ?>">
             <?php if ($ghalya_is_landing) : ?>
-              <a class="mt-nav-link d-none d-md-inline" href="#benefits"><?php echo $ghalya_language === 'ar' ? 'المزايا' : 'Benefits'; ?></a>
-              <a class="mt-nav-link d-none d-md-inline" href="#faq"><?php echo $ghalya_language === 'ar' ? 'الأسئلة الشائعة' : 'FAQs'; ?></a>
+              <a class="mt-nav-link d-none d-md-inline" href="#benefits"><?php echo esc_html(ghalya_option_text('ghalya_nav_benefits')); ?></a>
+              <a class="mt-nav-link d-none d-md-inline" href="#faq"><?php echo esc_html(ghalya_option_text('ghalya_nav_faq')); ?></a>
             <?php endif; ?>
-            <a class="mt-nav-link d-none d-sm-inline" href="<?php echo esc_url(ghalya_page_url('terms', $ghalya_language)); ?>"><?php echo $ghalya_language === 'ar' ? 'الشروط' : 'Terms'; ?></a>
-            <a class="mt-lang-link" href="<?php echo esc_url(ghalya_language_switch_url()); ?>"><?php echo $ghalya_language === 'ar' ? 'English' : 'العربية'; ?></a>
+            <a class="mt-nav-link d-none d-sm-inline" href="<?php echo esc_url(ghalya_page_url('terms', $ghalya_language)); ?>"><?php echo esc_html(ghalya_option_text('ghalya_nav_terms')); ?></a>
+            <a class="mt-lang-link" href="<?php echo esc_url(ghalya_language_switch_url()); ?>"><?php echo esc_html(ghalya_option_text('ghalya_language_switch')); ?></a>
           </div>
         </div>
       </nav>
     </header>
-

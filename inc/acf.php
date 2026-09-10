@@ -4,6 +4,29 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
+function ghalya_acf_page_locations()
+{
+    $locations = array();
+    $page_ids = get_option('ghalya_page_ids', array());
+
+    foreach (array('en', 'ar') as $language) {
+        foreach (array('home', 'profile', 'tier', 'work', 'proposal', 'contact', 'success', 'terms') as $screen) {
+            $page_id = isset($page_ids[$language][$screen]) ? absint($page_ids[$language][$screen]) : 0;
+
+            if ($page_id) {
+                $locations[] = array(array('param' => 'page', 'operator' => '==', 'value' => (string) $page_id));
+            }
+        }
+    }
+
+    // Template rules keep the field available before the page map is rebuilt.
+    foreach (array('templates/home.php', 'templates/landing.php', 'templates/application.php', 'templates/success.php', 'templates/terms.php') as $template) {
+        $locations[] = array(array('param' => 'page_template', 'operator' => '==', 'value' => $template));
+    }
+
+    return $locations;
+}
+
 function ghalya_register_acf_fields()
 {
     if (!function_exists('acf_add_local_field_group')) {
@@ -11,16 +34,22 @@ function ghalya_register_acf_fields()
     }
 
     acf_add_local_field_group(array(
-        'key' => 'group_ghalya_landing',
-        'title' => __('Ghalya landing content', 'ghalya'),
+        'key' => 'group_ghalya_page_content',
+        'title' => __('Ghalya Page Content', 'ghalya'),
         'fields' => array(
-            array('key' => 'field_ghalya_hero_title', 'label' => __('Hero title', 'ghalya'), 'name' => 'ghalya_hero_title', 'type' => 'text'),
-            array('key' => 'field_ghalya_hero_accent', 'label' => __('Highlighted word', 'ghalya'), 'name' => 'ghalya_hero_accent', 'type' => 'text'),
-            array('key' => 'field_ghalya_hero_copy', 'label' => __('Hero description', 'ghalya'), 'name' => 'ghalya_hero_copy', 'type' => 'textarea', 'rows' => 3),
-            array('key' => 'field_ghalya_join_label', 'label' => __('Join button label', 'ghalya'), 'name' => 'ghalya_join_label', 'type' => 'text'),
+            array(
+                'key' => 'field_ghalya_page_markup',
+                'label' => __('Page content', 'ghalya'),
+                'name' => 'ghalya_page_markup',
+                'type' => 'textarea',
+                'instructions' => __('Edit the page sections and copy here. Keep the mt- classes and form field names intact so the supplied layout and application workflow continue to work.', 'ghalya'),
+                'rows' => 36,
+                'new_lines' => '',
+            ),
         ),
-        'location' => array(array(array('param' => 'page_template', 'operator' => '==', 'value' => 'templates/landing.php'))),
+        'location' => ghalya_acf_page_locations(),
         'position' => 'acf_after_title',
+        'style' => 'seamless',
     ));
 
     acf_add_local_field_group(array(
@@ -49,11 +78,35 @@ function ghalya_register_acf_options()
     }
 
     acf_add_options_sub_page(array(
+        'page_title' => __('Ghalya theme content', 'ghalya'),
+        'menu_title' => __('Ghalya content', 'ghalya'),
+        'parent_slug' => 'themes.php',
+        'menu_slug' => 'ghalya-theme-content',
+        'capability' => 'edit_theme_options',
+    ));
+
+    acf_add_options_sub_page(array(
         'page_title' => __('Ghalya email settings', 'ghalya'),
         'menu_title' => __('Email settings', 'ghalya'),
         'parent_slug' => 'edit.php?post_type=ghalya_submission',
         'menu_slug' => 'ghalya-email-settings',
         'capability' => 'manage_options',
+    ));
+
+    acf_add_local_field_group(array(
+        'key' => 'group_ghalya_header_content',
+        'title' => __('Header labels', 'ghalya'),
+        'fields' => array(
+            array('key' => 'field_ghalya_nav_benefits_en', 'label' => __('Benefits label — English', 'ghalya'), 'name' => 'ghalya_nav_benefits_en', 'type' => 'text'),
+            array('key' => 'field_ghalya_nav_benefits_ar', 'label' => __('Benefits label — Arabic', 'ghalya'), 'name' => 'ghalya_nav_benefits_ar', 'type' => 'text'),
+            array('key' => 'field_ghalya_nav_faq_en', 'label' => __('FAQ label — English', 'ghalya'), 'name' => 'ghalya_nav_faq_en', 'type' => 'text'),
+            array('key' => 'field_ghalya_nav_faq_ar', 'label' => __('FAQ label — Arabic', 'ghalya'), 'name' => 'ghalya_nav_faq_ar', 'type' => 'text'),
+            array('key' => 'field_ghalya_nav_terms_en', 'label' => __('Terms label — English', 'ghalya'), 'name' => 'ghalya_nav_terms_en', 'type' => 'text'),
+            array('key' => 'field_ghalya_nav_terms_ar', 'label' => __('Terms label — Arabic', 'ghalya'), 'name' => 'ghalya_nav_terms_ar', 'type' => 'text'),
+            array('key' => 'field_ghalya_language_switch_en', 'label' => __('Language switch — English page', 'ghalya'), 'name' => 'ghalya_language_switch_en', 'type' => 'text'),
+            array('key' => 'field_ghalya_language_switch_ar', 'label' => __('Language switch — Arabic page', 'ghalya'), 'name' => 'ghalya_language_switch_ar', 'type' => 'text'),
+        ),
+        'location' => array(array(array('param' => 'options_page', 'operator' => '==', 'value' => 'ghalya-theme-content'))),
     ));
 
     acf_add_local_field_group(array(
@@ -68,3 +121,30 @@ function ghalya_register_acf_options()
 }
 add_action('acf/init', 'ghalya_register_acf_options');
 
+/**
+ * Seed global labels once, after which administrators fully control them.
+ */
+function ghalya_seed_acf_options()
+{
+    if (!function_exists('update_field') || get_option('ghalya_acf_options_seeded')) {
+        return;
+    }
+
+    $defaults = array(
+        'field_ghalya_nav_benefits_en' => 'Benefits',
+        'field_ghalya_nav_benefits_ar' => 'المزايا',
+        'field_ghalya_nav_faq_en' => 'FAQs',
+        'field_ghalya_nav_faq_ar' => 'الأسئلة الشائعة',
+        'field_ghalya_nav_terms_en' => 'Terms',
+        'field_ghalya_nav_terms_ar' => 'الشروط',
+        'field_ghalya_language_switch_en' => 'العربية',
+        'field_ghalya_language_switch_ar' => 'English',
+    );
+
+    foreach ($defaults as $field_key => $value) {
+        update_field($field_key, $value, 'option');
+    }
+
+    update_option('ghalya_acf_options_seeded', 1, false);
+}
+add_action('acf/init', 'ghalya_seed_acf_options', 20);

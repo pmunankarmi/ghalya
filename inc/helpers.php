@@ -115,58 +115,54 @@ function ghalya_body_classes($classes)
 add_filter('body_class', 'ghalya_body_classes');
 
 /**
- * Apply optional ACF landing-page copy while retaining the supplied defaults.
+ * Read a translated label from the ACF theme options page.
  */
-function ghalya_apply_landing_fields($content)
+function ghalya_option_text($field_name)
 {
-    if (!function_exists('get_field')) {
-        return $content;
+    $language = ghalya_current_language();
+    $translated_name = $field_name . '_' . $language;
+
+    if (function_exists('get_field')) {
+        return (string) get_field($translated_name, 'option');
     }
 
-    $title = trim((string) get_field('ghalya_hero_title'));
-    $accent = trim((string) get_field('ghalya_hero_accent'));
-    $copy = trim((string) get_field('ghalya_hero_copy'));
-    $button = trim((string) get_field('ghalya_join_label'));
+    return (string) get_option('options_' . $translated_name, '');
+}
 
-    if ($title !== '') {
-        $heading = esc_html($title);
+/**
+ * Read the original supplied design once when seeding a page's ACF content.
+ */
+function ghalya_default_page_markup($screen, $language)
+{
+    $source_name = $screen === 'home' ? 'index' : $screen;
+    $source_name .= $language === 'ar' ? '-ar.html' : '.html';
+    $source_path = GHALYA_THEME_PATH . '/content-seed/' . $source_name;
 
-        if ($accent !== '') {
-            $heading .= ' <span class="mt-accent">' . esc_html($accent) . '</span>';
-        }
-
-        $content = preg_replace_callback(
-            '~(<h1 class="mt-(?:mobile-title|hero-title)">).*?(</h1>)~s',
-            function ($matches) use ($heading) {
-                return $matches[1] . $heading . $matches[2];
-            },
-            $content
-        );
+    if (!is_readable($source_path)) {
+        return '';
     }
 
-    if ($copy !== '') {
-        $safe_copy = esc_html($copy);
-        $content = preg_replace_callback(
-            '~(<p class="mt-(?:mobile-copy|hero-copy)">).*?(</p>)~s',
-            function ($matches) use ($safe_copy) {
-                return $matches[1] . $safe_copy . $matches[2];
-            },
-            $content
-        );
+    $source = file_get_contents($source_path);
+    return preg_match('~<main\b[^>]*>.*?</main>~s', $source, $matches) ? $matches[0] : '';
+}
+
+/**
+ * Populate a page's ACF field without overwriting later admin edits.
+ */
+function ghalya_seed_page_content($page_id, $screen, $language)
+{
+    if (get_post_meta($page_id, 'ghalya_page_markup', true) !== '') {
+        return;
     }
 
-    if ($button !== '') {
-        $safe_button = esc_html($button);
-        $content = preg_replace_callback(
-            '~(<a\b[^>]*class="[^"]*mt-community-join[^"]*"[^>]*>).*?(</a>)~s',
-            function ($matches) use ($safe_button) {
-                return $matches[1] . $safe_button . $matches[2];
-            },
-            $content
-        );
+    $markup = ghalya_default_page_markup($screen, $language);
+
+    if ($markup === '') {
+        return;
     }
 
-    return $content;
+    update_post_meta($page_id, 'ghalya_page_markup', $markup);
+    update_post_meta($page_id, '_ghalya_page_markup', 'field_ghalya_page_markup');
 }
 
 /**
@@ -175,24 +171,24 @@ function ghalya_apply_landing_fields($content)
 function ghalya_render_screen($screen)
 {
     $language = ghalya_current_language();
-    $source_name = $screen === 'home' ? 'index' : $screen;
-    $source_name .= $language === 'ar' ? '-ar.html' : '.html';
-    $source_path = GHALYA_THEME_PATH . '/views/' . $source_name;
+    $page_id = get_queried_object_id();
+    $content = '';
 
-    if (!is_readable($source_path)) {
+    if (function_exists('get_field')) {
+        $content = (string) get_field('ghalya_page_markup', $page_id, false);
+    }
+
+    if ($content === '') {
+        $content = (string) get_post_meta($page_id, 'ghalya_page_markup', true);
+    }
+
+    if ($content === '') {
         echo '<main class="mt-form-page"><div class="container"><p>';
-        esc_html_e('This page could not be loaded.', 'ghalya');
+        esc_html_e('Add this page’s content in the Ghalya Page Content fields.', 'ghalya');
         echo '</p></div></main>';
         return;
     }
 
-    $source = file_get_contents($source_path);
-
-    if (!preg_match('~<main\b[^>]*>.*?</main>~s', $source, $matches)) {
-        return;
-    }
-
-    $content = $matches[0];
     $asset_url = GHALYA_THEME_URI . '/assets/';
     $content = str_replace(
         array('src="assets/', 'href="assets/'),
@@ -249,10 +245,6 @@ function ghalya_render_screen($screen)
         }
     }
 
-    if ($screen === 'home') {
-        $content = ghalya_apply_landing_fields($content);
-    }
-
-    // The view is maintained by the theme and all dynamic values were escaped above.
+    // Page markup is entered by trusted administrators through ACF.
     echo $content; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 }
