@@ -18,6 +18,17 @@ A bilingual WordPress conversion of the Ghalya creator-program HTML pack.
 4. In Polylang, confirm that English and Arabic are configured and choose the translated Ghalya landing pages as the front page if required.
 5. Set the form recipient under **Ghalya Submissions → Email settings**. If blank, the WordPress administration email is used.
 
+## Theme updates
+
+Version 1.3.0 adds update checks through the WordPress Themes screen. Install this
+version manually once, then future published GitHub releases will appear as normal
+theme updates in WordPress.
+
+Each release must use a semantic version tag such as `v1.3.0` and include the
+installable asset `ghalya-wordpress-theme.zip`. WordPress checks the latest public
+release approximately every six hours; **Dashboard → Updates → Check again** can
+be used to request a fresh check.
+
 ## Submissions
 
 Completed applications are stored as private records under **Ghalya Submissions**. Each record includes the complete multi-step form, review status, reviewer notes, and email-delivery status.
