@@ -286,7 +286,7 @@
       field.appendChild(input);
       container.appendChild(field);
 
-      // Register the new optional URL with the active validator.
+      // Register the additional URL with the active validator.
       if (
         typeof window.jQuery !== "undefined" &&
         typeof window.jQuery.fn.validate === "function"
@@ -333,11 +333,24 @@
   // Turn each partner strip into a touch-friendly logo carousel.
   if (typeof window.Swiper !== "undefined") {
     document.querySelectorAll(".mt-partner-swiper").forEach(function (slider) {
+      var reduceMotion = window.matchMedia(
+        "(prefers-reduced-motion: reduce)",
+      ).matches;
+
       new window.Swiper(slider, {
         slidesPerView: 4.35,
         spaceBetween: 8,
         grabCursor: true,
-        watchOverflow: true,
+        loop: true,
+        speed: 850,
+        watchOverflow: false,
+        autoplay: reduceMotion
+          ? false
+          : {
+              delay: 1800,
+              disableOnInteraction: false,
+              pauseOnMouseEnter: true,
+            },
         freeMode: {
           enabled: true,
           momentumRatio: 0.65,
