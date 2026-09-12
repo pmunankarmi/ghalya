@@ -58,7 +58,7 @@ $progress_labels = ghalya_content_rows($content, 'progress_labels');
           <span class="mt-step-label"><?php echo esc_html(ghalya_content_text($content, 'step_label')); ?></span>
         </div>
         <h1 class="mt-form-title"><?php echo esc_html(ghalya_content_text($content, 'title')); ?></h1>
-        <p class="mt-form-intro"><?php echo esc_html(ghalya_content_text($content, 'intro')); ?></p>
+        <p class="mt-form-intro mt-form-lead"><?php echo esc_html(ghalya_content_text($content, 'intro')); ?></p>
 
         <?php if ($screen === 'profile') : ?>
           <div class="row g-3">
@@ -105,13 +105,14 @@ $progress_labels = ghalya_content_rows($content, 'progress_labels');
         <?php endif; ?>
 
         <?php if ($screen === 'tier') : ?>
+          <div class="mt-tier-name"><?php echo esc_html(ghalya_content_text($content, 'tier_name')); ?></div>
           <div class="mt-tier-card">
-            <div class="mt-tier-name"><?php echo esc_html(ghalya_content_text($content, 'tier_name')); ?></div>
             <div class="mt-tier-amount">
               <?php echo esc_html(ghalya_content_text($content, 'tier_amount')); ?>
               <span><?php echo esc_html(ghalya_content_text($content, 'tier_suffix')); ?></span>
             </div>
-            <hr />
+          </div>
+          <div class="mt-tier-deliverables">
             <span class="mt-label"><?php echo esc_html(ghalya_content_text($content, 'deliverables_label')); ?></span>
             <div class="mt-mini-deliverables">
               <?php foreach (ghalya_content_rows($content, 'deliverables') as $deliverable) : ?>
@@ -119,7 +120,7 @@ $progress_labels = ghalya_content_rows($content, 'progress_labels');
               <?php endforeach; ?>
             </div>
           </div>
-          <p class="mt-form-intro mt-4"><?php echo esc_html(ghalya_content_text($content, 'note')); ?></p>
+          <p class="mt-tier-note"><?php echo esc_html(ghalya_content_text($content, 'note')); ?></p>
         <?php endif; ?>
 
         <?php if ($screen === 'work') : ?>

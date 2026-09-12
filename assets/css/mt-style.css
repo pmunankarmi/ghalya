@@ -964,47 +964,49 @@ a {
 }
 
 .mt-tier-card {
-  padding: 1.8rem;
+  padding: 1.35rem 1.6rem;
   border: 1px solid var(--mt-line);
   border-radius: var(--mt-radius-md);
-  background: linear-gradient(135deg, #fff, #faf2ff);
+  background: #fff;
 }
 .mt-tier-name {
-  color: var(--mt-ink-soft);
-  font-size: 0.8rem;
-  font-weight: 900;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
+  margin-bottom: 0.55rem;
+  color: var(--mt-ink);
+  font-size: 0.86rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
 }
 .mt-tier-amount {
-  margin: 0.4rem 0;
+  margin: 0;
   color: var(--mt-purple-deep);
-  font-size: clamp(2.3rem, 5vw, 4.4rem);
-  font-weight: 900;
+  font-size: clamp(2.2rem, 4vw, 3.35rem);
+  font-weight: 700;
   letter-spacing: -0.055em;
+  line-height: 1.05;
 }
 .mt-tier-amount span {
-  color: var(--mt-ink-soft);
+  color: var(--mt-purple);
   font-size: 0.95rem;
+  font-weight: 400;
   letter-spacing: 0;
+}
+.mt-tier-deliverables {
+  margin-top: 1.75rem;
 }
 .mt-mini-deliverables {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 0.8rem;
-  margin-top: 1.25rem;
+  grid-template-columns: 1fr;
+  gap: 0.35rem;
+  margin-top: 0.35rem;
 }
 .mt-mini-deliverable {
   display: flex;
   align-items: center;
   gap: 0.45rem;
-  padding: 1rem;
-  border: 1px solid var(--mt-line);
-  border-radius: 14px;
-  color: var(--mt-purple-deep);
-  background: #fff;
-  font-size: 0.82rem;
-  font-weight: 800;
+  padding: 0.2rem 0;
+  color: var(--mt-ink);
+  font-size: 0.84rem;
+  font-weight: 600;
   text-align: start;
 }
 .mt-mini-deliverable::before {
@@ -1013,6 +1015,17 @@ a {
   flex: 0 0 16px;
   background: url("../images/check-icon.svg") center / contain no-repeat;
   content: "";
+}
+.mt-tier-note {
+  max-width: 660px;
+  margin: 1.35rem 0 0;
+  color: var(--mt-ink);
+  font-size: 0.76rem;
+  font-weight: 300;
+  line-height: 1.5;
+}
+.mt-tier-note::before {
+  content: "*";
 }
 
 .mt-agree {
@@ -1205,6 +1218,10 @@ a {
       );
   }
 
+  .mt-landing-page {
+    padding-bottom: calc(76px + env(safe-area-inset-bottom));
+  }
+
   .mt-site-header {
     position: relative;
     height: 0;
@@ -1378,16 +1395,26 @@ a {
   }
   .mt-mobile-join {
     display: flex;
+    position: fixed;
+    z-index: 80;
+    right: auto;
+    bottom: max(10px, env(safe-area-inset-bottom));
+    left: 50%;
     width: 242px;
     min-height: 51px;
-    margin: 22px auto 0;
+    margin: 0;
     padding: 0 12px;
     gap: 8px;
     background: var(--mt-purple-deep);
     box-shadow: none;
     font-size: 16px;
     font-weight: 400;
+    transform: translateX(-50%);
     white-space: nowrap;
+  }
+
+  .mt-mobile-join:hover {
+    transform: translateX(-50%) translateY(-2px);
   }
 
   .mt-hero .g-5,
@@ -1752,7 +1779,7 @@ a {
     transform: scaleX(-1);
   }
 
-  .mt-application-page .mt-form-card > .mt-form-intro {
+  .mt-application-page .mt-form-card > .mt-form-lead {
     display: none;
   }
   .mt-application-page .mt-field {
@@ -1799,26 +1826,64 @@ a {
   }
 
   .mt-application-page .mt-tier-card {
-    padding: 14px;
+    padding: 10px 12px;
     border: 0;
     border-radius: 10px;
     background: #fff;
   }
+  .mt-step-2 .mt-form-top {
+    min-height: 54px;
+  }
+  .mt-step-2 .mt-form-title {
+    margin-bottom: 53px;
+  }
+  .mt-step-2 .mt-form-title::after {
+    margin-top: 30px;
+  }
+  .mt-application-page .mt-tier-name {
+    margin-bottom: 8px;
+    font-size: 13px;
+    line-height: 1.25;
+  }
   .mt-application-page .mt-tier-amount {
     font-size: 30px;
   }
+  .mt-application-page .mt-tier-amount span {
+    display: block;
+    margin-top: 3px;
+    font-size: 10px;
+    line-height: 1.25;
+  }
+  .mt-application-page .mt-tier-deliverables {
+    margin-top: 18px;
+  }
+  .mt-application-page .mt-tier-deliverables .mt-label {
+    margin-bottom: 5px;
+    color: var(--mt-ink);
+    font-size: 13px;
+    font-weight: 700;
+  }
   .mt-application-page .mt-mini-deliverables {
-    gap: 4px;
+    gap: 0;
+    margin-top: 0;
   }
   .mt-application-page .mt-mini-deliverable {
-    padding: 7px 4px;
-    border: 0;
-    font-size: 10px;
+    padding: 4px 0;
+    font-size: 11px;
+    line-height: 1.3;
   }
   .mt-application-page .mt-mini-deliverable::before {
     width: 14px;
     height: 14px;
     flex-basis: 14px;
+  }
+  .mt-application-page .mt-tier-note {
+    margin-top: 16px;
+    font-size: 10px;
+    line-height: 1.3;
+  }
+  .mt-step-2 .mt-form-actions {
+    padding-top: 18px;
   }
   .mt-application-page .mt-agree {
     margin-top: 24px !important;

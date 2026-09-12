@@ -4,7 +4,7 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-define('GHALYA_THEME_VERSION', '1.4.2');
+define('GHALYA_THEME_VERSION', '1.4.3');
 define('GHALYA_THEME_PATH', get_template_directory());
 define('GHALYA_THEME_URI', get_template_directory_uri());
 

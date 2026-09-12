@@ -7,7 +7,7 @@ $ghalya_is_landing = $ghalya_screen === 'home';
 <html lang="<?php echo esc_attr($ghalya_language); ?>" dir="<?php echo $ghalya_language === 'ar' ? 'rtl' : 'ltr'; ?>">
   <head>
     <meta charset="<?php bloginfo('charset'); ?>" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <?php wp_head(); ?>
   </head>
   <body <?php body_class(); ?>>

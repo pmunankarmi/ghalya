@@ -6,6 +6,7 @@ $tiers = ghalya_content_rows($content, 'tiers');
 $benefit_icons = array('earn-icon.svg', 'grow-icon.svg', 'brand-partner-icon.svg', 'exclusive-product-icon.svg');
 $deliverable_icons = array('store-icon.svg', 'reels-icon.svg', '2-story-icon.svg', 'fast-payout-icon.svg');
 $partner_images = array('delsey-paris.png', 'kipling.png', 'danube.png', 'zahrat-alrawdah.png', 'bindawood.png');
+$partner_slides = array_merge($partner_images, $partner_images);
 ?>
 <main>
   <section class="mt-hero">
@@ -39,10 +40,13 @@ $partner_images = array('delsey-paris.png', 'kipling.png', 'danube.png', 'zahrat
           <?php echo esc_html(ghalya_content_text($content, 'reward_suffix')); ?>
           <small><?php echo esc_html(ghalya_content_text($content, 'reward_detail')); ?></small>
         </div>
-        <a class="mt-btn-primary mt-community-join mt-mobile-join" href="<?php echo esc_url($profile_url); ?>">
-          <?php echo esc_html(ghalya_content_text($content, 'join_button')); ?>
-        </a>
       </div>
+      <a class="mt-btn-primary mt-community-join mt-mobile-join mt-mobile-only" href="<?php echo esc_url($profile_url); ?>">
+        <?php echo esc_html(ghalya_content_text($content, 'join_button')); ?>
+        <span class="mt-arrow-dot" aria-hidden="true">
+          <img class="mt-up-arrow" src="<?php echo esc_url(ghalya_asset_url('images/up-arrow.svg')); ?>" alt="" />
+        </span>
+      </a>
 
       <div class="row align-items-center g-5 mt-desktop-hero">
         <div class="col-lg-7" data-aos="fade-up">
@@ -107,7 +111,7 @@ $partner_images = array('delsey-paris.png', 'kipling.png', 'danube.png', 'zahrat
       </div>
       <div class="swiper mt-partner-swiper" data-aos="fade-up" data-aos-delay="100" aria-label="<?php echo esc_attr(ghalya_content_text($content, 'partners_label')); ?>">
         <div class="swiper-wrapper">
-          <?php foreach ($partner_images as $partner_image) : ?>
+          <?php foreach ($partner_slides as $partner_image) : ?>
             <div class="swiper-slide"><div class="mt-partner"><img src="<?php echo esc_url(ghalya_asset_url('images/' . $partner_image)); ?>" alt="" /></div></div>
           <?php endforeach; ?>
         </div>
