@@ -7,7 +7,7 @@ A bilingual WordPress conversion of the Ghalya creator-program HTML pack.
 - WordPress 6.4 or newer
 - PHP 7.4 or newer
 - ACF Pro for landing-page fields, email settings, and submission review fields
-- Polylang for English/Arabic page relationships and language switching
+- Polylang for English/Arabic page relationships and language switching; same-slug compatibility is bundled with the theme
 - A configured WordPress mail transport; an SMTP plugin is recommended in production
 
 ## Installation
@@ -42,6 +42,8 @@ Select the site logo under **Appearance → Customize → Site Identity**. The b
 The dedicated **Ghalya Home Page** template and every application, success, and terms page receive screen-specific ACF fields. Homepage fields are grouped into section tabs, and each Benefits or Deliverables card has its own optional icon image selector. Administrators edit plain text, labels, choices, and repeatable items such as benefits, FAQs, and terms sections. All HTML remains in the theme's `template-parts` files. English and Arabic pages keep independent content through Polylang.
 
 The separate **Appearance → Ghalya content** page is not used. The application progress list is built from the direct child pages beneath **Join the Community**, ordered by WordPress menu order, so each page title is managed in the standard page title field. The shared sidebar title and introduction are edited once on the translated **Join the Community** parent page. Shared application labels such as Previous, Back, Continue, and Submit application are managed under **Languages → Translations**. The language switcher displays the native language name configured under **Languages → Languages**. Gutenberg and the standard page content editor are disabled because this theme uses ACF as its page-editing interface.
+
+English and Arabic translations use the same page slug. Polylang's language segment distinguishes each URL, while the bundled Polylang Slug compatibility layer prevents WordPress from adding suffixes such as `-2` or `-ar`. Existing generated pages are migrated automatically on the next administrator visit.
 
 Notification subjects support `{name}`, `{email}`, and `{submission_id}` tokens. The branded responsive email uses the Customizer site logo and sends an application summary to administrators plus an English or Arabic confirmation to the applicant.
 

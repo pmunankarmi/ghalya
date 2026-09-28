@@ -58,7 +58,7 @@ function ghalya_page_url($screen, $language = '')
         return home_url('/');
     }
 
-    $slug = $screen . ($language === 'ar' ? '-ar' : '');
+    $slug = $screen;
     return home_url('/' . $slug . '/');
 }
 
@@ -271,20 +271,4 @@ function ghalya_application_label($key)
 function ghalya_asset_url($path)
 {
     return GHALYA_THEME_URI . '/assets/' . ltrim($path, '/');
-}
-
-/** Render HTML from theme-owned template parts and plain ACF values. */
-function ghalya_render_screen($screen)
-{
-    $allowed = array('home', 'profile', 'tier', 'work', 'proposal', 'contact', 'success', 'terms');
-
-    if (!in_array($screen, $allowed, true)) {
-        return;
-    }
-
-    $template = in_array($screen, array('profile', 'tier', 'work', 'proposal', 'contact'), true) ? 'application' : $screen;
-    get_template_part('template-parts/screens/' . $template, null, array(
-        'screen' => $screen,
-        'content' => ghalya_screen_content($screen),
-    ));
 }

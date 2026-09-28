@@ -80,15 +80,15 @@ add_action('wp_enqueue_scripts', 'ghalya_enqueue_assets');
 function ghalya_create_required_pages()
 {
     $definitions = array(
-        'join' => array('template' => 'templates/join.php', 'en' => array('Join the Community', 'join'), 'ar' => array('انضم إلى مجتمع غالية', 'join-ar')),
-        'home' => array('template' => 'templates/home.php', 'en' => array('Ghalya Creator Program', 'ghalya'), 'ar' => array('برنامج صناع المحتوى من غالية', 'ghalya-ar')),
-        'profile' => array('template' => 'templates/application.php', 'en' => array('Your Profile', 'profile'), 'ar' => array('ملفك الشخصي', 'profile-ar')),
-        'tier' => array('template' => 'templates/application.php', 'en' => array('Your Tier', 'tier'), 'ar' => array('فئتك', 'tier-ar')),
-        'work' => array('template' => 'templates/application.php', 'en' => array('Your Work', 'work'), 'ar' => array('أعمالك', 'work-ar')),
-        'proposal' => array('template' => 'templates/application.php', 'en' => array('Your Proposal', 'proposal'), 'ar' => array('مقترحك', 'proposal-ar')),
-        'contact' => array('template' => 'templates/application.php', 'en' => array('Contact Details', 'contact'), 'ar' => array('تفاصيل التواصل', 'contact-ar')),
-        'success' => array('template' => 'templates/success.php', 'en' => array('Application Submitted', 'success'), 'ar' => array('تم تقديم الطلب', 'success-ar')),
-        'terms' => array('template' => 'templates/terms.php', 'en' => array('Terms and Conditions', 'terms'), 'ar' => array('الشروط والأحكام', 'terms-ar')),
+        'join' => array('template' => 'templates/join.php', 'en' => array('Join the Community', 'join'), 'ar' => array('انضم إلى مجتمع غالية', 'join')),
+        'home' => array('template' => 'templates/home.php', 'en' => array('Ghalya Creator Program', 'ghalya'), 'ar' => array('برنامج صناع المحتوى من غالية', 'ghalya')),
+        'profile' => array('template' => 'templates/application.php', 'en' => array('Your Profile', 'profile'), 'ar' => array('ملفك الشخصي', 'profile')),
+        'tier' => array('template' => 'templates/application.php', 'en' => array('Your Tier', 'tier'), 'ar' => array('فئتك', 'tier')),
+        'work' => array('template' => 'templates/application.php', 'en' => array('Your Work', 'work'), 'ar' => array('أعمالك', 'work')),
+        'proposal' => array('template' => 'templates/application.php', 'en' => array('Your Proposal', 'proposal'), 'ar' => array('مقترحك', 'proposal')),
+        'contact' => array('template' => 'templates/application.php', 'en' => array('Contact Details', 'contact'), 'ar' => array('تفاصيل التواصل', 'contact')),
+        'success' => array('template' => 'templates/success.php', 'en' => array('Application Submitted', 'success'), 'ar' => array('تم تقديم الطلب', 'success')),
+        'terms' => array('template' => 'templates/terms.php', 'en' => array('Terms and Conditions', 'terms'), 'ar' => array('الشروط والأحكام', 'terms')),
     );
 
     $page_ids = get_option('ghalya_page_ids', array());
@@ -148,6 +148,7 @@ function ghalya_create_required_pages()
 
     update_option('ghalya_page_ids', $page_ids, false);
     ghalya_link_polylang_pages();
+    ghalya_sync_translated_page_slugs(false);
     flush_rewrite_rules();
 }
 add_action('after_switch_theme', 'ghalya_create_required_pages');
@@ -175,6 +176,54 @@ function ghalya_link_polylang_pages()
     }
 }
 add_action('admin_init', 'ghalya_link_polylang_pages');
+
+/** Keep every translated Ghalya page pair on the same slug. */
+function ghalya_sync_translated_page_slugs($flush_rewrites = true)
+{
+    if (!function_exists('polylang_slug_unique_slug_in_language') || !function_exists('pll_get_post_language')) {
+        return false;
+    }
+
+    $shared_slugs = array(
+        'join' => 'join',
+        'home' => 'ghalya',
+        'profile' => 'profile',
+        'tier' => 'tier',
+        'work' => 'work',
+        'proposal' => 'proposal',
+        'contact' => 'contact',
+        'success' => 'success',
+        'terms' => 'terms',
+    );
+    $page_ids = get_option('ghalya_page_ids', array());
+    $changed = false;
+
+    foreach (array('en', 'ar') as $language) {
+        foreach ($shared_slugs as $screen => $slug) {
+            $page_id = isset($page_ids[$language][$screen]) ? absint($page_ids[$language][$screen]) : 0;
+
+            if (!$page_id || !get_post_status($page_id) || get_post_field('post_name', $page_id) === $slug) {
+                continue;
+            }
+
+            $result = wp_update_post(array(
+                'ID' => $page_id,
+                'post_name' => $slug,
+            ), true);
+
+            if (!is_wp_error($result) && get_post_field('post_name', $page_id) === $slug) {
+                $changed = true;
+            }
+        }
+    }
+
+    if ($changed && $flush_rewrites) {
+        flush_rewrite_rules();
+    }
+
+    return $changed;
+}
+add_action('admin_init', 'ghalya_sync_translated_page_slugs', 30);
 
 /**
  * Move existing landing pages to the dedicated Home template once per release.

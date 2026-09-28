@@ -4,6 +4,8 @@
  */
 
 get_header();
-ghalya_render_screen('terms');
+get_template_part('template-parts/screens/terms', null, array(
+    'screen' => 'terms',
+    'content' => ghalya_screen_content('terms'),
+));
 get_footer();
-

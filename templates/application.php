@@ -11,6 +11,8 @@ if (!in_array($screen, $allowed_screens, true)) {
 }
 
 get_header();
-ghalya_render_screen($screen);
+get_template_part('template-parts/screens/application', null, array(
+    'screen' => $screen,
+    'content' => ghalya_screen_content($screen),
+));
 get_footer();
-
