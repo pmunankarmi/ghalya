@@ -84,7 +84,7 @@ function ghalya_application_is_complete($application, $language, $email, $phone)
     $proposal = ghalya_application_step($application, $language, 4);
 
     $profile_fields = array('full_name', 'instagram', 'followers', 'city');
-    $work_fields = array('instagram_url', 'tiktok_url', 'snapchat', 'brand_content_url');
+    $work_fields = array('instagram_url');
 
     foreach ($profile_fields as $field) {
         if (empty($profile[$field])) {

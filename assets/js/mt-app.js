@@ -278,7 +278,6 @@
       input.className = "mt-input";
       input.id = inputId;
       input.name = "brand_content_url_" + linkCount;
-      input.required = true;
       input.type = "url";
       input.placeholder = button.getAttribute("data-mt-placeholder");
 
@@ -292,7 +291,6 @@
         typeof window.jQuery.fn.validate === "function"
       ) {
         window.jQuery(input).rules("add", {
-          required: true,
           url: true,
         });
       }

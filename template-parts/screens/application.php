@@ -126,18 +126,18 @@ $progress_labels = ghalya_content_rows($content, 'progress_labels');
         <?php if ($screen === 'work') : ?>
           <?php
           $work_fields = array(
-              array('instagram-link', 'instagram_url', 'url', 'instagram'),
-              array('tiktok-link', 'tiktok_url', 'url', 'tiktok'),
-              array('snapchat', 'snapchat', 'text', 'snapchat'),
-              array('brand-content', 'brand_content_url', 'url', 'brand_content'),
+              array('id' => 'instagram-link', 'name' => 'instagram_url', 'type' => 'url', 'content_key' => 'instagram', 'required' => true),
+              array('id' => 'tiktok-link', 'name' => 'tiktok_url', 'type' => 'url', 'content_key' => 'tiktok', 'required' => false),
+              array('id' => 'snapchat', 'name' => 'snapchat', 'type' => 'text', 'content_key' => 'snapchat', 'required' => false),
+              array('id' => 'brand-content', 'name' => 'brand_content_url', 'type' => 'url', 'content_key' => 'brand_content', 'required' => false),
           );
           ?>
           <div class="row g-3">
             <?php foreach ($work_fields as $field) : ?>
               <div class="col-md-6">
                 <div class="mt-field">
-                  <label class="mt-label" for="<?php echo esc_attr($field[0]); ?>"><?php echo esc_html(ghalya_content_text($content, $field[3] . '_label')); ?></label>
-                  <input class="mt-input" id="<?php echo esc_attr($field[0]); ?>" name="<?php echo esc_attr($field[1]); ?>" required type="<?php echo esc_attr($field[2]); ?>" placeholder="<?php echo esc_attr(ghalya_content_text($content, $field[3] . '_placeholder')); ?>" />
+                  <label class="mt-label" for="<?php echo esc_attr($field['id']); ?>"><?php echo esc_html(ghalya_content_text($content, $field['content_key'] . '_label')); ?></label>
+                  <input class="mt-input" id="<?php echo esc_attr($field['id']); ?>" name="<?php echo esc_attr($field['name']); ?>"<?php echo $field['required'] ? ' required' : ''; ?> type="<?php echo esc_attr($field['type']); ?>" placeholder="<?php echo esc_attr(ghalya_content_text($content, $field['content_key'] . '_placeholder')); ?>" />
                 </div>
               </div>
             <?php endforeach; ?>
