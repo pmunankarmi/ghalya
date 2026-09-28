@@ -57,12 +57,6 @@ function ghalya_acf_choice_rows($scope, $name, $label)
 function ghalya_acf_application_fields($screen)
 {
     $fields = array(
-        ghalya_acf_plain_field($screen, 'aside_title', __('Sidebar title', 'ghalya')),
-        ghalya_acf_plain_field($screen, 'aside_intro', __('Sidebar introduction', 'ghalya'), 'textarea', array('rows' => 3, 'new_lines' => '')),
-        ghalya_acf_text_rows($screen, 'progress_labels', __('Progress labels', 'ghalya'), 'label', __('Label', 'ghalya')),
-        ghalya_acf_plain_field($screen, 'top_back_label', __('Top back-link label', 'ghalya')),
-        ghalya_acf_plain_field($screen, 'step_label', __('Step label', 'ghalya')),
-        ghalya_acf_plain_field($screen, 'title', __('Page title', 'ghalya')),
         ghalya_acf_plain_field($screen, 'intro', __('Page introduction', 'ghalya'), 'textarea', array('rows' => 3, 'new_lines' => '')),
     );
 
@@ -79,8 +73,6 @@ function ghalya_acf_application_fields($screen)
             ghalya_acf_choice_rows($screen, 'city_choices', __('City choices', 'ghalya')),
             ghalya_acf_plain_field($screen, 'category_label', __('Content-category label', 'ghalya')),
             ghalya_acf_choice_rows($screen, 'category_choices', __('Content-category choices', 'ghalya')),
-            ghalya_acf_plain_field($screen, 'back_button', __('Cancel button', 'ghalya')),
-            ghalya_acf_plain_field($screen, 'next_button', __('Next button', 'ghalya')),
         ));
     }
 
@@ -92,8 +84,6 @@ function ghalya_acf_application_fields($screen)
             ghalya_acf_plain_field($screen, 'deliverables_label', __('Deliverables heading', 'ghalya')),
             ghalya_acf_text_rows($screen, 'deliverables', __('Deliverables', 'ghalya')),
             ghalya_acf_plain_field($screen, 'note', __('Tier note', 'ghalya'), 'textarea', array('rows' => 4, 'new_lines' => '')),
-            ghalya_acf_plain_field($screen, 'back_button', __('Back button', 'ghalya')),
-            ghalya_acf_plain_field($screen, 'next_button', __('Continue button', 'ghalya')),
         ));
     }
 
@@ -105,8 +95,6 @@ function ghalya_acf_application_fields($screen)
 
         $fields = array_merge($fields, array(
             ghalya_acf_plain_field($screen, 'add_link_button', __('Add-link button', 'ghalya')),
-            ghalya_acf_plain_field($screen, 'back_button', __('Back button', 'ghalya')),
-            ghalya_acf_plain_field($screen, 'next_button', __('Continue button', 'ghalya')),
         ));
     }
 
@@ -115,8 +103,6 @@ function ghalya_acf_application_fields($screen)
             ghalya_acf_plain_field($screen, 'brands_label', __('Brands label', 'ghalya')),
             ghalya_acf_choice_rows($screen, 'brand_choices', __('Brand choices', 'ghalya')),
             ghalya_acf_plain_field($screen, 'availability_label', __('Availability label', 'ghalya')),
-            ghalya_acf_plain_field($screen, 'back_button', __('Back button', 'ghalya')),
-            ghalya_acf_plain_field($screen, 'next_button', __('Continue button', 'ghalya')),
         ));
     }
 
@@ -129,8 +115,6 @@ function ghalya_acf_application_fields($screen)
             ghalya_acf_plain_field($screen, 'consent_before', __('Consent text before link', 'ghalya')),
             ghalya_acf_plain_field($screen, 'consent_link', __('Terms link label', 'ghalya')),
             ghalya_acf_plain_field($screen, 'consent_after', __('Consent text after link', 'ghalya')),
-            ghalya_acf_plain_field($screen, 'back_button', __('Back button', 'ghalya')),
-            ghalya_acf_plain_field($screen, 'submit_button', __('Submit button', 'ghalya')),
         ));
     }
 
@@ -162,10 +146,15 @@ function ghalya_acf_home_fields()
     }
 
     $fields[] = ghalya_acf_plain_field('home', 'tiers', __('Creator tiers', 'ghalya'), 'repeater', array(
-        'layout' => 'table',
+        'layout' => 'block',
+        'button_label' => __('Add tier', 'ghalya'),
         'sub_fields' => array(
             ghalya_acf_plain_field('home_tier_rows', 'label', __('Label', 'ghalya')),
             ghalya_acf_plain_field('home_tier_rows', 'active', __('Active', 'ghalya'), 'true_false', array('ui' => 1)),
+            ghalya_acf_plain_field('home_tier_rows', 'reward_amount', __('Reward amount', 'ghalya')),
+            ghalya_acf_plain_field('home_tier_rows', 'reward_suffix', __('Mobile reward suffix', 'ghalya')),
+            ghalya_acf_plain_field('home_tier_rows', 'reward_desktop_suffix', __('Desktop reward suffix', 'ghalya')),
+            ghalya_acf_plain_field('home_tier_rows', 'reward_detail', __('Reward details', 'ghalya'), 'textarea', array('rows' => 2, 'new_lines' => '')),
         ),
     ));
 
@@ -200,6 +189,10 @@ function ghalya_register_acf_fields()
     }
 
     $screen_fields = array(
+        'join' => array(
+            ghalya_acf_plain_field('join', 'aside_title', __('Sidebar title', 'ghalya')),
+            ghalya_acf_plain_field('join', 'aside_intro', __('Sidebar introduction', 'ghalya'), 'textarea', array('rows' => 3, 'new_lines' => '')),
+        ),
         'home' => ghalya_acf_home_fields(),
         'profile' => ghalya_acf_application_fields('profile'),
         'tier' => ghalya_acf_application_fields('tier'),

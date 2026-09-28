@@ -451,6 +451,10 @@ a {
 }
 
 .mt-tier-pill {
+  appearance: none;
+  cursor: pointer;
+  font-family: inherit;
+  line-height: inherit;
   padding: 0.55rem 1rem;
   border: 1px solid var(--mt-line);
   border-radius: 999px;
@@ -460,10 +464,16 @@ a {
   font-weight: 800;
 }
 
-.mt-tier-pill.mt-is-active {
+.mt-tier-pill.mt-is-active,
+.mt-tier-pill.active {
   color: #fff;
   border-color: var(--mt-purple);
   background: var(--mt-purple);
+}
+
+.mt-tier-pill:focus-visible {
+  outline: 3px solid rgba(230, 54, 174, 0.35);
+  outline-offset: 2px;
 }
 
 /* Landing page sections */
@@ -1359,7 +1369,8 @@ a {
     text-align: center;
   }
 
-  .mt-mobile-only .mt-tier-pill.mt-is-active {
+  .mt-mobile-only .mt-tier-pill.mt-is-active,
+  .mt-mobile-only .mt-tier-pill.active {
     color: #fff;
     border-color: #a162d9;
     background: #a162d9;

@@ -1,6 +1,6 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: Ghalya Creator Program 1.4.5\n"
+"Project-Id-Version: Ghalya Creator Program 1.4.6\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-09-28 00:00+0545\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
@@ -21,4 +21,24 @@ msgstr ""
 
 #: header.php
 msgid "Terms"
+msgstr ""
+
+#: inc/helpers.php
+msgid "Previous"
+msgstr ""
+
+#: inc/helpers.php
+msgid "Back"
+msgstr ""
+
+#: inc/helpers.php
+msgid "Continue"
+msgstr ""
+
+#: inc/helpers.php
+msgid "Submit application"
+msgstr ""
+
+#: template-parts/screens/application.php
+msgid "Step %1$d of %2$d"
 msgstr ""

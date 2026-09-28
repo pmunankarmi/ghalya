@@ -1,6 +1,6 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: Ghalya Creator Program 1.4.5\n"
+"Project-Id-Version: Ghalya Creator Program 1.4.6\n"
 "PO-Revision-Date: 2026-09-28 00:00+0545\n"
 "Last-Translator: Prime Digital\n"
 "Language-Team: Arabic\n"
@@ -22,3 +22,23 @@ msgstr "الأسئلة الشائعة"
 #: header.php
 msgid "Terms"
 msgstr "الشروط"
+
+#: inc/helpers.php
+msgid "Previous"
+msgstr "السابق"
+
+#: inc/helpers.php
+msgid "Back"
+msgstr "رجوع"
+
+#: inc/helpers.php
+msgid "Continue"
+msgstr "متابعة"
+
+#: inc/helpers.php
+msgid "Submit application"
+msgstr "تقديم الطلب"
+
+#: template-parts/screens/application.php
+msgid "Step %1$d of %2$d"
+msgstr "الخطوة %1$d من %2$d"

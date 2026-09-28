@@ -20,6 +20,24 @@ function ghalya_theme_setup()
 }
 add_action('after_setup_theme', 'ghalya_theme_setup');
 
+/** Expose shared interface copy in Polylang's String translations screen. */
+function ghalya_register_polylang_strings()
+{
+    if (function_exists('pll_register_string')) {
+        $labels = array(
+            'ghalya_application_previous' => 'Previous',
+            'ghalya_application_back' => 'Back',
+            'ghalya_application_continue' => 'Continue',
+            'ghalya_application_submit' => 'Submit application',
+        );
+
+        foreach ($labels as $name => $label) {
+            pll_register_string($name, $label, 'Ghalya');
+        }
+    }
+}
+add_action('init', 'ghalya_register_polylang_strings', 20);
+
 /**
  * This theme uses ACF for page editing, so the block editor is not required.
  */
@@ -62,6 +80,7 @@ add_action('wp_enqueue_scripts', 'ghalya_enqueue_assets');
 function ghalya_create_required_pages()
 {
     $definitions = array(
+        'join' => array('template' => 'templates/join.php', 'en' => array('Join the Community', 'join'), 'ar' => array('انضم إلى مجتمع غالية', 'join-ar')),
         'home' => array('template' => 'templates/home.php', 'en' => array('Ghalya Creator Program', 'ghalya'), 'ar' => array('برنامج صناع المحتوى من غالية', 'ghalya-ar')),
         'profile' => array('template' => 'templates/application.php', 'en' => array('Your Profile', 'profile'), 'ar' => array('ملفك الشخصي', 'profile-ar')),
         'tier' => array('template' => 'templates/application.php', 'en' => array('Your Tier', 'tier'), 'ar' => array('فئتك', 'tier-ar')),
@@ -73,9 +92,13 @@ function ghalya_create_required_pages()
     );
 
     $page_ids = get_option('ghalya_page_ids', array());
+    $application_order = array_flip(array('profile', 'tier', 'work', 'proposal', 'contact'));
 
     foreach ($definitions as $screen => $definition) {
         foreach (array('en', 'ar') as $language) {
+            $is_application_step = in_array($screen, array('profile', 'tier', 'work', 'proposal', 'contact'), true);
+            $parent_id = $is_application_step && isset($page_ids[$language]['join']) ? absint($page_ids[$language]['join']) : 0;
+            $menu_order = $is_application_step ? $application_order[$screen] + 1 : 0;
             $existing_id = isset($page_ids[$language][$screen]) ? absint($page_ids[$language][$screen]) : 0;
 
             if (!$existing_id || !get_post_status($existing_id)) {
@@ -90,16 +113,30 @@ function ghalya_create_required_pages()
                 $existing_id = wp_insert_post(array(
                     'post_title' => $definition[$language][0],
                     'post_name' => $definition[$language][1],
+                    'post_parent' => $parent_id,
+                    'menu_order' => $menu_order,
                     'post_status' => 'publish',
                     'post_type' => 'page',
                 ));
             }
 
             if (!is_wp_error($existing_id) && $existing_id) {
+                $existing_page = get_post($existing_id);
+
+                if ((int) wp_get_post_parent_id($existing_id) !== $parent_id || (int) $existing_page->menu_order !== $menu_order) {
+                    wp_update_post(array(
+                        'ID' => $existing_id,
+                        'post_parent' => $parent_id,
+                        'menu_order' => $menu_order,
+                    ));
+                }
+
                 update_post_meta($existing_id, '_wp_page_template', $definition['template']);
                 update_post_meta($existing_id, '_ghalya_screen', $screen);
                 update_post_meta($existing_id, '_ghalya_language', $language);
+
                 ghalya_seed_page_content($existing_id, $screen, $language);
+
                 $page_ids[$language][$screen] = (int) $existing_id;
 
                 if (function_exists('pll_set_post_language')) {
@@ -123,7 +160,7 @@ function ghalya_link_polylang_pages()
 
     $page_ids = get_option('ghalya_page_ids', array());
 
-    foreach (array('home', 'profile', 'tier', 'work', 'proposal', 'contact', 'success', 'terms') as $screen) {
+    foreach (array('join', 'home', 'profile', 'tier', 'work', 'proposal', 'contact', 'success', 'terms') as $screen) {
         $english_id = isset($page_ids['en'][$screen]) ? absint($page_ids['en'][$screen]) : 0;
         $arabic_id = isset($page_ids['ar'][$screen]) ? absint($page_ids['ar'][$screen]) : 0;
 
@@ -152,6 +189,9 @@ function ghalya_upgrade_theme_pages()
         return;
     }
 
+    // Create the Join parent and move application steps beneath it on update.
+    ghalya_create_required_pages();
+
     $page_ids = get_option('ghalya_page_ids', array());
 
     foreach (array('en', 'ar') as $language) {
@@ -163,7 +203,7 @@ function ghalya_upgrade_theme_pages()
     }
 
     foreach (array('en', 'ar') as $language) {
-        foreach (array('home', 'profile', 'tier', 'work', 'proposal', 'contact', 'success', 'terms') as $screen) {
+        foreach (array('join', 'home', 'profile', 'tier', 'work', 'proposal', 'contact', 'success', 'terms') as $screen) {
             $page_id = isset($page_ids[$language][$screen]) ? absint($page_ids[$language][$screen]) : 0;
 
             if ($page_id && get_post_status($page_id)) {
@@ -182,7 +222,7 @@ function ghalya_seed_all_page_content()
     $page_ids = get_option('ghalya_page_ids', array());
 
     foreach (array('en', 'ar') as $language) {
-        foreach (array('home', 'profile', 'tier', 'work', 'proposal', 'contact', 'success', 'terms') as $screen) {
+        foreach (array('join', 'home', 'profile', 'tier', 'work', 'proposal', 'contact', 'success', 'terms') as $screen) {
             $page_id = isset($page_ids[$language][$screen]) ? absint($page_ids[$language][$screen]) : 0;
 
             if ($page_id && get_post_status($page_id)) {

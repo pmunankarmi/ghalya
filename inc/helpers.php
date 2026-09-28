@@ -36,7 +36,7 @@ function ghalya_current_screen()
     }
 
     $screen = get_post_meta(get_queried_object_id(), '_ghalya_screen', true);
-    $allowed = array('home', 'profile', 'tier', 'work', 'proposal', 'contact', 'success', 'terms');
+    $allowed = array('home', 'join', 'profile', 'tier', 'work', 'proposal', 'contact', 'success', 'terms');
 
     return in_array($screen, $allowed, true) ? $screen : 'home';
 }
@@ -187,6 +187,85 @@ function ghalya_content_text($content, $key)
 function ghalya_content_rows($content, $key)
 {
     return isset($content[$key]) && is_array($content[$key]) ? $content[$key] : array();
+}
+
+/** Fetch the direct application pages beneath the translated Join parent. */
+function ghalya_application_pages($language = '')
+{
+    $language = in_array($language, array('en', 'ar'), true) ? $language : ghalya_current_language();
+    $page_ids = get_option('ghalya_page_ids', array());
+    $join_id = isset($page_ids[$language]['join']) ? absint($page_ids[$language]['join']) : 0;
+
+    if ($join_id) {
+        $pages = get_pages(array(
+            'parent' => $join_id,
+            'post_status' => 'publish',
+            'sort_column' => 'menu_order,post_title',
+            'sort_order' => 'ASC',
+        ));
+
+        if ($pages) {
+            return $pages;
+        }
+    }
+
+    // Keep the progress list available until an older installation is upgraded.
+    $pages = array();
+
+    foreach (array('profile', 'tier', 'work', 'proposal', 'contact') as $screen) {
+        $page_id = isset($page_ids[$language][$screen]) ? absint($page_ids[$language][$screen]) : 0;
+
+        if ($page_id && get_post_status($page_id)) {
+            $pages[] = get_post($page_id);
+        }
+    }
+
+    return array_filter($pages);
+}
+
+/** Return shared sidebar copy from the translated Join parent page. */
+function ghalya_join_content($language = '')
+{
+    $language = in_array($language, array('en', 'ar'), true) ? $language : ghalya_current_language();
+    $page_ids = get_option('ghalya_page_ids', array());
+    $join_id = isset($page_ids[$language]['join']) ? absint($page_ids[$language]['join']) : 0;
+    $content = array();
+
+    if ($join_id && function_exists('get_field')) {
+        $content = get_field('ghalya_join_content', $join_id);
+    }
+
+    return is_array($content) && $content ? $content : ghalya_default_content('join', $language);
+}
+
+/** Use Polylang's editable application labels with bundled fallbacks. */
+function ghalya_application_label($key)
+{
+    $labels = array(
+        'previous' => array('source' => 'Previous', 'fallback' => __('Previous', 'ghalya')),
+        'back' => array('source' => 'Back', 'fallback' => __('Back', 'ghalya')),
+        'continue' => array('source' => 'Continue', 'fallback' => __('Continue', 'ghalya')),
+        'submit' => array('source' => 'Submit application', 'fallback' => __('Submit application', 'ghalya')),
+    );
+
+    if (!isset($labels[$key])) {
+        return '';
+    }
+
+    $source = $labels[$key]['source'];
+    $fallback = $labels[$key]['fallback'];
+
+    if (!function_exists('pll__')) {
+        return $fallback;
+    }
+
+    $translated = pll__($source);
+
+    if ($translated === $source && ghalya_current_language() !== 'en') {
+        return $fallback;
+    }
+
+    return $translated;
 }
 
 function ghalya_asset_url($path)

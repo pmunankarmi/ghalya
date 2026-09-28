@@ -14,7 +14,7 @@ A bilingual WordPress conversion of the Ghalya creator-program HTML pack.
 
 1. Upload `ghalya-wordpress-theme.zip` in **Appearance → Themes → Add New → Upload Theme**.
 2. Activate ACF Pro and Polylang, then activate the theme.
-3. The theme creates connected English and Arabic pages for the landing page, five form steps, success page, and terms page.
+3. The theme creates connected English and Arabic pages for the landing page, Join the Community parent, five child form steps, success page, and terms page.
 4. In Polylang, confirm that English and Arabic are configured and choose the translated Ghalya landing pages as the front page if required.
 5. Configure administrator and applicant emails under **Ghalya Submissions → Notifications**. If the recipient is blank, the WordPress administration email is used.
 
@@ -41,7 +41,7 @@ Select the site logo under **Appearance → Customize → Site Identity**. The b
 
 The dedicated **Ghalya Home Page** template and every application, success, and terms page receive screen-specific ACF fields. Administrators edit plain text, labels, choices, and repeatable items such as benefits, FAQs, and terms sections. All HTML remains in the theme's `template-parts` files. English and Arabic pages keep independent content through Polylang.
 
-The separate **Appearance → Ghalya content** page is not used. Shared navigation labels use the theme's WordPress translation files, while the language switcher displays the native language name configured under **Languages → Languages**. Gutenberg and the standard page content editor are disabled because this theme uses ACF as its page-editing interface.
+The separate **Appearance → Ghalya content** page is not used. The application progress list is built from the direct child pages beneath **Join the Community**, ordered by WordPress menu order, so each page title is managed in the standard page title field. The shared sidebar title and introduction are edited once on the translated **Join the Community** parent page. Shared application labels such as Previous, Back, Continue, and Submit application are managed under **Languages → Translations**. The language switcher displays the native language name configured under **Languages → Languages**. Gutenberg and the standard page content editor are disabled because this theme uses ACF as its page-editing interface.
 
 Notification subjects support `{name}`, `{email}`, and `{submission_id}` tokens. The branded responsive email uses the Customizer site logo and sends an application summary to administrators plus an English or Arabic confirmation to the applicant.
 

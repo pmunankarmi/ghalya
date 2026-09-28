@@ -30,10 +30,10 @@ function ghalya_default_content($screen, $language)
                 'explore_button' => 'Explore the program',
                 'tiers_label' => 'Creator tiers',
                 'tiers' => array(
-                    array('label' => 'Nano', 'active' => 0),
-                    array('label' => 'Micro', 'active' => 1),
-                    array('label' => 'Mid', 'active' => 0),
-                    array('label' => 'Macro', 'active' => 0),
+                    array('label' => 'Nano', 'active' => 0, 'reward_amount' => '2,000 SAR', 'reward_suffix' => 'in points', 'reward_desktop_suffix' => 'in Ghalya loyalty points', 'reward_detail' => 'Per campaign: 1 store visit · 2 Reels · 2 Story sets'),
+                    array('label' => 'Micro', 'active' => 1, 'reward_amount' => '2,000 SAR', 'reward_suffix' => 'in points', 'reward_desktop_suffix' => 'in Ghalya loyalty points', 'reward_detail' => 'Per campaign: 1 store visit · 2 Reels · 2 Story sets'),
+                    array('label' => 'Mid', 'active' => 0, 'reward_amount' => '2,000 SAR', 'reward_suffix' => 'in points', 'reward_desktop_suffix' => 'in Ghalya loyalty points', 'reward_detail' => 'Per campaign: 1 store visit · 2 Reels · 2 Story sets'),
+                    array('label' => 'Macro', 'active' => 0, 'reward_amount' => '2,000 SAR', 'reward_suffix' => 'in points', 'reward_desktop_suffix' => 'in Ghalya loyalty points', 'reward_detail' => 'Per campaign: 1 store visit · 2 Reels · 2 Story sets'),
                 ),
                 'partners_eyebrow' => 'The universe',
                 'partners_title' => 'Earn and spend with our partners',
@@ -86,13 +86,11 @@ function ghalya_default_content($screen, $language)
                     array('question' => 'What content rights do brands get?', 'answer' => 'Creators retain ownership and grant limited campaign usage rights as described in the terms.'),
                 ),
             ),
-            'profile' => array(
+            'join' => array(
                 'aside_title' => 'Your Ghalya application',
                 'aside_intro' => 'Tell us about your audience, work, and availability. It only takes a few minutes.',
-                'progress_labels' => ghalya_default_progress_labels('en'),
-                'top_back_label' => 'Back home',
-                'step_label' => 'Step 1 of 5',
-                'title' => 'Your profile',
+            ),
+            'profile' => array(
                 'intro' => 'Start with the basics so we can match you with the right campaign tier.',
                 'full_name_label' => 'Full Name',
                 'full_name_placeholder' => 'Firstname Lastname',
@@ -105,16 +103,8 @@ function ghalya_default_content($screen, $language)
                 'city_choices' => ghalya_default_choice_rows(array('Riyadh' => 'Riyadh', 'Jeddah' => 'Jeddah', 'Dammam' => 'Dammam', 'Other' => 'Other')),
                 'category_label' => 'Content category',
                 'category_choices' => ghalya_default_choice_rows(array('Food' => 'Food', 'Travel' => 'Travel', 'Chefs' => 'Chefs', 'Offers and Deals' => 'Offers & Deals', 'Beauty' => 'Beauty', 'Fitness' => 'Fitness', 'Lifestyle' => 'Lifestyle')),
-                'back_button' => 'Cancel',
-                'next_button' => 'Next',
             ),
             'tier' => array(
-                'aside_title' => 'Your Ghalya application',
-                'aside_intro' => 'Your starting tier reflects the audience range and category selected in your profile.',
-                'progress_labels' => ghalya_default_progress_labels('en'),
-                'top_back_label' => 'Previous',
-                'step_label' => 'Step 2 of 5',
-                'title' => 'Your tier',
                 'intro' => 'Here is your assigned campaign starter tier.',
                 'tier_name' => 'Micro Creator',
                 'tier_amount' => '2,000 SAR',
@@ -122,16 +112,8 @@ function ghalya_default_content($screen, $language)
                 'deliverables_label' => 'Expected Deliverables',
                 'deliverables' => array(array('text' => '1 store visit'), array('text' => '2 Reels / TikToks'), array('text' => '2 Story sets')),
                 'note' => 'Based on your follower count and profile category, this is your assigned campaign starter tier. Ghalya loyalty points can be redeemed at 5+ partner retail outlets in Saudi Arabia.',
-                'back_button' => 'Back',
-                'next_button' => 'Continue',
             ),
             'work' => array(
-                'aside_title' => 'Your Ghalya application',
-                'aside_intro' => 'Share the channels and content that best represent your creative point of view.',
-                'progress_labels' => ghalya_default_progress_labels('en'),
-                'top_back_label' => 'Previous',
-                'step_label' => 'Step 3 of 5',
-                'title' => 'Your work',
                 'intro' => 'Add your public profiles and an example of previous branded content if available.',
                 'instagram_label' => 'Instagram Profile Link',
                 'instagram_placeholder' => 'Paste link here',
@@ -142,30 +124,14 @@ function ghalya_default_content($screen, $language)
                 'brand_content_label' => 'Previous branded content',
                 'brand_content_placeholder' => 'Paste link here',
                 'add_link_button' => '+ Add another link',
-                'back_button' => 'Back',
-                'next_button' => 'Continue',
             ),
             'proposal' => array(
-                'aside_title' => 'Your Ghalya application',
-                'aside_intro' => 'Choose the brands you are excited to work with and tell us when you are free.',
-                'progress_labels' => ghalya_default_progress_labels('en'),
-                'top_back_label' => 'Previous',
-                'step_label' => 'Step 4 of 5',
-                'title' => 'Your proposal',
                 'intro' => 'Pick one or more partners you would like to create for.',
                 'brands_label' => 'Select Brands',
                 'brand_choices' => ghalya_default_choice_rows(array('Danube' => 'Danube', 'BinDawood' => 'BinDawood', 'Delsey' => 'Delsey', 'Kipling' => 'Kipling', 'Zahrat Al Rawdah' => 'Zahrat Al Rawdah')),
                 'availability_label' => 'Earliest availability',
-                'back_button' => 'Back',
-                'next_button' => 'Continue',
             ),
             'contact' => array(
-                'aside_title' => 'One final step',
-                'aside_intro' => 'Add your contact details and review the program terms before submitting.',
-                'progress_labels' => ghalya_default_progress_labels('en'),
-                'top_back_label' => 'Previous',
-                'step_label' => 'Step 5 of 5',
-                'title' => 'Contact details',
                 'intro' => 'Where should the Ghalya team reach you about this campaign?',
                 'email_label' => 'Email Address',
                 'email_placeholder' => 'email@email.com',
@@ -174,8 +140,6 @@ function ghalya_default_content($screen, $language)
                 'consent_before' => 'I agree to Ghalya’s',
                 'consent_link' => 'terms and conditions',
                 'consent_after' => 'and allow Ghalya to contact me about this campaign.',
-                'back_button' => 'Back',
-                'submit_button' => 'Submit application',
             ),
             'success' => array(
                 'eyebrow' => 'Application complete',
@@ -218,8 +182,10 @@ function ghalya_default_content($screen, $language)
                 'explore_button' => 'اكتشف البرنامج',
                 'tiers_label' => 'مستويات صناع المحتوى',
                 'tiers' => array(
-                    array('label' => 'نانو', 'active' => 0), array('label' => 'مايكرو', 'active' => 1),
-                    array('label' => 'متوسط', 'active' => 0), array('label' => 'ماكرو', 'active' => 0),
+                    array('label' => 'نانو', 'active' => 0, 'reward_amount' => '2,000 ريال', 'reward_suffix' => 'كنقاط', 'reward_desktop_suffix' => 'كنقاط ولاء في غالية', 'reward_detail' => 'لكل حملة: زيارة فرع واحدة · 2 فيديو ريلز · مجموعتان من الستوري'),
+                    array('label' => 'مايكرو', 'active' => 1, 'reward_amount' => '2,000 ريال', 'reward_suffix' => 'كنقاط', 'reward_desktop_suffix' => 'كنقاط ولاء في غالية', 'reward_detail' => 'لكل حملة: زيارة فرع واحدة · 2 فيديو ريلز · مجموعتان من الستوري'),
+                    array('label' => 'متوسط', 'active' => 0, 'reward_amount' => '2,000 ريال', 'reward_suffix' => 'كنقاط', 'reward_desktop_suffix' => 'كنقاط ولاء في غالية', 'reward_detail' => 'لكل حملة: زيارة فرع واحدة · 2 فيديو ريلز · مجموعتان من الستوري'),
+                    array('label' => 'ماكرو', 'active' => 0, 'reward_amount' => '2,000 ريال', 'reward_suffix' => 'كنقاط', 'reward_desktop_suffix' => 'كنقاط ولاء في غالية', 'reward_detail' => 'لكل حملة: زيارة فرع واحدة · 2 فيديو ريلز · مجموعتان من الستوري'),
                 ),
                 'partners_eyebrow' => 'عالم غالية',
                 'partners_title' => 'اكسب واستبدل نقاطك مع شركائنا',
@@ -272,13 +238,11 @@ function ghalya_default_content($screen, $language)
                     array('question' => 'ما هي حقوق المحتوى التي تحصل عليها العلامات؟', 'answer' => 'يحتفظ صانع المحتوى بالملكية ويمنح حقوق استخدام محدودة وفقًا للشروط.'),
                 ),
             ),
-            'profile' => array(
+            'join' => array(
                 'aside_title' => 'طلب الانضمام إلى غالية',
                 'aside_intro' => 'أخبرنا عن جمهورك وأعمالك وتوفرك. لن يستغرق الأمر سوى دقائق.',
-                'progress_labels' => ghalya_default_progress_labels('ar'),
-                'top_back_label' => 'العودة للرئيسية',
-                'step_label' => 'الخطوة 1 من 5',
-                'title' => 'ملفك الشخصي',
+            ),
+            'profile' => array(
                 'intro' => 'ابدأ بالمعلومات الأساسية لنتمكن من تحديد مستوى الحملة المناسب لك.',
                 'full_name_label' => 'الاسم الكامل', 'full_name_placeholder' => 'الاسم الكامل',
                 'instagram_label' => 'حساب إنستغرام', 'instagram_placeholder' => '@instagramhandle',
@@ -288,53 +252,34 @@ function ghalya_default_content($screen, $language)
                 'city_choices' => ghalya_default_choice_rows(array('Riyadh' => 'الرياض', 'Jeddah' => 'جدة', 'Dammam' => 'الدمام', 'Other' => 'أخرى')),
                 'category_label' => 'فئة المحتوى',
                 'category_choices' => ghalya_default_choice_rows(array('Food' => 'طعام', 'Cooking' => 'طهي', 'Lifestyle' => 'أسلوب حياة', 'Beauty' => 'جمال', 'Fitness' => 'لياقة بدنية', 'Travel' => 'سفر', 'Offers' => 'عروض')),
-                'back_button' => 'إلغاء', 'next_button' => 'متابعة',
             ),
             'tier' => array(
-                'aside_title' => 'طلب الانضمام إلى غالية',
-                'aside_intro' => 'يعكس مستوى البداية نطاق جمهورك وفئة المحتوى المختارة.',
-                'progress_labels' => ghalya_default_progress_labels('ar'),
-                'top_back_label' => 'السابق', 'step_label' => 'الخطوة 2 من 5',
-                'title' => 'مستواك', 'intro' => 'هذا هو مستوى البداية المخصص لك للحملة.',
+                'intro' => 'هذا هو مستوى البداية المخصص لك للحملة.',
                 'tier_name' => 'صانع محتوى مايكرو', 'tier_amount' => '2,000 ريال', 'tier_suffix' => 'كنقاط ولاء في غالية',
                 'deliverables_label' => 'المهام المتوقعة',
                 'deliverables' => array(array('text' => 'زيارة فرع واحدة'), array('text' => '2 فيديو ريلز'), array('text' => 'مجموعتان من الستوري')),
                 'note' => 'بناءً على عدد متابعيك وفئة ملفك الشخصي، هذا هو مستوى البداية المخصص لك. يمكن استبدال نقاط غالية لدى أكثر من 5 علامات تجارية شريكة في المملكة.',
-                'back_button' => 'رجوع', 'next_button' => 'متابعة',
             ),
             'work' => array(
-                'aside_title' => 'طلب الانضمام إلى غالية',
-                'aside_intro' => 'شارك القنوات والمحتوى الذي يمثل أسلوبك الإبداعي.',
-                'progress_labels' => ghalya_default_progress_labels('ar'),
-                'top_back_label' => 'السابق', 'step_label' => 'الخطوة 3 من 5',
-                'title' => 'أعمالك', 'intro' => 'أضف حساباتك العامة ومثالًا لمحتوى سابق للعلامات التجارية إن توفر.',
+                'intro' => 'أضف حساباتك العامة ومثالًا لمحتوى سابق للعلامات التجارية إن توفر.',
                 'instagram_label' => 'رابط حساب إنستغرام', 'instagram_placeholder' => 'رابط حساب إنستغرام',
                 'tiktok_label' => 'رابط حساب تيك توك', 'tiktok_placeholder' => 'رابط حساب تيك توك',
                 'snapchat_label' => 'اسم مستخدم سناب شات', 'snapchat_placeholder' => 'اسم مستخدم سناب شات',
                 'brand_content_label' => 'محتوى سابق للعلامات', 'brand_content_placeholder' => 'رابط المحتوى',
-                'add_link_button' => '+ إضافة رابط آخر', 'back_button' => 'رجوع', 'next_button' => 'متابعة',
+                'add_link_button' => '+ إضافة رابط آخر',
             ),
             'proposal' => array(
-                'aside_title' => 'طلب الانضمام إلى غالية',
-                'aside_intro' => 'اختر العلامات التي ترغب في العمل معها وحدد وقت توفرك.',
-                'progress_labels' => ghalya_default_progress_labels('ar'),
-                'top_back_label' => 'السابق', 'step_label' => 'الخطوة 4 من 5',
-                'title' => 'مقترحك', 'intro' => 'حدد علامة واحدة أو أكثر ترغب في صناعة المحتوى لها.',
+                'intro' => 'حدد علامة واحدة أو أكثر ترغب في صناعة المحتوى لها.',
                 'brands_label' => 'حدد العلامات التجارية',
                 'brand_choices' => ghalya_default_choice_rows(array('Danube' => 'Danube', 'BinDawood' => 'BinDawood', 'Delsey' => 'Delsey', 'Kipling' => 'Kipling', 'Zahrat Al Rawdah' => 'Zahrat Al Rawdah')),
-                'availability_label' => 'أقرب تاريخ متاح', 'back_button' => 'رجوع', 'next_button' => 'متابعة',
+                'availability_label' => 'أقرب تاريخ متاح',
             ),
             'contact' => array(
-                'aside_title' => 'خطوة أخيرة',
-                'aside_intro' => 'أضف تفاصيل التواصل وراجع شروط البرنامج قبل تقديم الطلب.',
-                'progress_labels' => ghalya_default_progress_labels('ar'),
-                'top_back_label' => 'السابق', 'step_label' => 'الخطوة 5 من 5',
-                'title' => 'تفاصيل التواصل', 'intro' => 'كيف يمكن لفريق غالية التواصل معك بشأن هذه الحملة؟',
+                'intro' => 'كيف يمكن لفريق غالية التواصل معك بشأن هذه الحملة؟',
                 'email_label' => 'البريد الإلكتروني', 'email_placeholder' => 'email@email.com',
                 'phone_label' => 'رقم الجوال', 'phone_placeholder' => '+966 0000 0000',
                 'consent_before' => 'أوافق على', 'consent_link' => 'شروط وأحكام غالية',
                 'consent_after' => 'وأسمح لغالية بالتواصل معي بشأن هذه الحملة.',
-                'back_button' => 'رجوع', 'submit_button' => 'تقديم الطلب',
             ),
             'success' => array(
                 'eyebrow' => 'اكتمل الطلب', 'title' => 'تم تقديم الطلب!',
@@ -358,17 +303,6 @@ function ghalya_default_content($screen, $language)
     );
 
     return isset($defaults[$language][$screen]) ? $defaults[$language][$screen] : array();
-}
-
-function ghalya_default_progress_labels($language)
-{
-    $labels = $language === 'ar'
-        ? array('الملف الشخصي', 'المستوى', 'أعمالك', 'المقترح', 'التواصل')
-        : array('Profile', 'Tier', 'Work', 'Proposal', 'Contact');
-
-    return array_map(function ($label) {
-        return array('label' => $label);
-    }, $labels);
 }
 
 function ghalya_default_choice_rows($choices)

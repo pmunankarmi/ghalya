@@ -10,7 +10,13 @@ $next_screen = $step < 4 ? $steps[$step + 1] : 'success';
 $previous_url = ghalya_page_url($previous_screen, $language);
 $next_url = ghalya_page_url($next_screen, $language);
 $is_contact = $screen === 'contact';
-$progress_labels = ghalya_content_rows($content, 'progress_labels');
+$join_content = ghalya_join_content($language);
+$progress_pages = ghalya_application_pages($language);
+$progress_page_ids = wp_list_pluck($progress_pages, 'ID');
+$progress_step = array_search(get_queried_object_id(), $progress_page_ids, true);
+$progress_step = $progress_step === false ? $step : $progress_step;
+$total_steps = $progress_pages ? count($progress_pages) : count($steps);
+$step_label = sprintf(__('Step %1$d of %2$d', 'ghalya'), $progress_step + 1, $total_steps);
 ?>
 <main class="mt-form-page">
   <?php if ($is_contact && !empty($_GET['submission_error'])) : ?>
@@ -23,16 +29,15 @@ $progress_labels = ghalya_content_rows($content, 'progress_labels');
   <div class="container">
     <div class="mt-form-layout">
       <aside class="mt-form-aside" data-aos="fade-up">
-        <h2><?php echo esc_html(ghalya_content_text($content, 'aside_title')); ?></h2>
-        <p><?php echo esc_html(ghalya_content_text($content, 'aside_intro')); ?></p>
+        <h2><?php echo esc_html(ghalya_content_text($join_content, 'aside_title')); ?></h2>
+        <p><?php echo esc_html(ghalya_content_text($join_content, 'aside_intro')); ?></p>
         <ol class="mt-progress-list">
-          <?php foreach ($steps as $index => $progress_screen) :
-              $label = isset($progress_labels[$index]['label']) ? $progress_labels[$index]['label'] : '';
-              $state_class = $index < $step ? ' mt-is-done' : ($index === $step ? ' mt-is-active' : '');
+          <?php foreach ($progress_pages as $index => $progress_page) :
+              $state_class = $index < $progress_step ? ' mt-is-done' : ($index === $progress_step ? ' mt-is-active' : '');
               ?>
             <li class="mt-progress-item<?php echo esc_attr($state_class); ?>">
-              <span class="mt-progress-number"><?php echo $index < $step ? '&#10003;' : esc_html((string) ($index + 1)); ?></span>
-              <span><?php echo esc_html($label); ?></span>
+              <span class="mt-progress-number"><?php echo $index < $progress_step ? '&#10003;' : esc_html((string) ($index + 1)); ?></span>
+              <span><?php echo esc_html(get_the_title($progress_page)); ?></span>
             </li>
           <?php endforeach; ?>
         </ol>
@@ -54,10 +59,10 @@ $progress_labels = ghalya_content_rows($content, 'progress_labels');
         <?php endif; ?>
 
         <div class="mt-form-top">
-          <a class="mt-back-link" href="<?php echo esc_url($previous_url); ?>"><?php echo esc_html(ghalya_content_text($content, 'top_back_label')); ?></a>
-          <span class="mt-step-label"><?php echo esc_html(ghalya_content_text($content, 'step_label')); ?></span>
+          <a class="mt-back-link" href="<?php echo esc_url($previous_url); ?>"><?php echo esc_html(ghalya_application_label('previous')); ?></a>
+          <span class="mt-step-label"><?php echo esc_html($step_label); ?></span>
         </div>
-        <h1 class="mt-form-title"><?php echo esc_html(ghalya_content_text($content, 'title')); ?></h1>
+        <h1 class="mt-form-title"><?php echo esc_html(get_the_title(get_queried_object_id())); ?></h1>
         <p class="mt-form-intro mt-form-lead"><?php echo esc_html(ghalya_content_text($content, 'intro')); ?></p>
 
         <?php if ($screen === 'profile') : ?>
@@ -190,8 +195,8 @@ $progress_labels = ghalya_content_rows($content, 'progress_labels');
         <?php endif; ?>
 
         <div class="mt-form-actions">
-          <a class="mt-btn-secondary" href="<?php echo esc_url($previous_url); ?>"><?php echo esc_html(ghalya_content_text($content, 'back_button')); ?></a>
-          <button class="mt-btn-primary" type="submit"><?php echo esc_html(ghalya_content_text($content, $is_contact ? 'submit_button' : 'next_button')); ?></button>
+          <a class="mt-btn-secondary" href="<?php echo esc_url($previous_url); ?>"><?php echo esc_html(ghalya_application_label('back')); ?></a>
+          <button class="mt-btn-primary" type="submit"><?php echo esc_html(ghalya_application_label($is_contact ? 'submit' : 'continue')); ?></button>
         </div>
       </form>
     </div>
