@@ -3,7 +3,9 @@
  * Template Name: Ghalya Home Page
  */
 
-$content = ghalya_screen_content('home');
+$page_id = get_queried_object_id();
+$content = function_exists('get_field') ? get_field('ghalya_home_content', $page_id) : array();
+$content = is_array($content) ? $content : array();
 $section_args = array(
     'content' => $content,
     'language' => ghalya_current_language(),

@@ -166,19 +166,6 @@ function ghalya_seed_page_content($page_id, $screen, $language)
     return true;
 }
 
-/** Return the current page's structured content with a safe first-run fallback. */
-function ghalya_screen_content($screen)
-{
-    $content = array();
-    $page_id = get_queried_object_id();
-
-    if (function_exists('get_field')) {
-        $content = get_field('ghalya_' . $screen . '_content', $page_id);
-    }
-
-    return is_array($content) && $content ? $content : ghalya_default_content($screen, ghalya_current_language());
-}
-
 function ghalya_content_text($content, $key)
 {
     return isset($content[$key]) && !is_array($content[$key]) ? (string) $content[$key] : '';
