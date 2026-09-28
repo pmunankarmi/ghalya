@@ -48,12 +48,16 @@ $show_details = !empty($email_args['show_details']);
                           </td>
                         </tr>
                         <?php foreach ($fields as $field_name => $value) : ?>
+                          <?php $display_value = is_array($value) ? implode(', ', array_map('strval', $value)) : (string) $value; ?>
+                          <?php if (trim($display_value) === '') : ?>
+                            <?php continue; ?>
+                          <?php endif; ?>
                           <tr>
                             <td style="width:38%;padding:11px 16px;border-top:1px solid #eee7f5;color:#654d85;font-size:12px;font-weight:700;vertical-align:top;">
                               <?php echo esc_html(ghalya_readable_label($field_name)); ?>
                             </td>
                             <td style="padding:11px 16px;border-top:1px solid #eee7f5;color:#2f2440;font-size:13px;line-height:1.5;vertical-align:top;word-break:break-word;">
-                              <?php echo esc_html(is_array($value) ? implode(', ', array_map('strval', $value)) : (string) $value); ?>
+                              <?php echo esc_html($display_value); ?>
                             </td>
                           </tr>
                         <?php endforeach; ?>

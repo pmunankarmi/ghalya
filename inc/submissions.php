@@ -159,11 +159,35 @@ function ghalya_render_application_email($args)
     return (string) ob_get_clean();
 }
 
+/** Use a sender on the website domain when no authenticated address is configured. */
+function ghalya_notification_sender_address()
+{
+    $configured_address = sanitize_email((string) ghalya_notification_option('ghalya_email_from_address', ''));
+
+    if (is_email($configured_address)) {
+        return $configured_address;
+    }
+
+    $site_host = strtolower((string) wp_parse_url(home_url('/'), PHP_URL_HOST));
+    $site_host = preg_replace('/^www\./', '', $site_host);
+
+    if ($site_host === '' || filter_var($site_host, FILTER_VALIDATE_IP)) {
+        return '';
+    }
+
+    $site_address = sanitize_email('no-reply@' . $site_host);
+    return is_email($site_address) ? $site_address : '';
+}
+
 function ghalya_notification_headers($reply_to = '')
 {
-    $headers = array('Content-Type: text/html; charset=UTF-8');
+    $headers = array(
+        'Content-Type: text/html; charset=UTF-8',
+        'Auto-Submitted: auto-generated',
+        'X-Auto-Response-Suppress: All',
+    );
     $from_name = sanitize_text_field((string) ghalya_notification_option('ghalya_email_from_name', 'Ghalya Creator Program'));
-    $from_address = sanitize_email((string) ghalya_notification_option('ghalya_email_from_address', ''));
+    $from_address = ghalya_notification_sender_address();
 
     if ($from_address !== '') {
         $headers[] = 'From: ' . $from_name . ' <' . $from_address . '>';
@@ -174,6 +198,38 @@ function ghalya_notification_headers($reply_to = '')
     }
 
     return $headers;
+}
+
+/** Add a plain-text alternative to Ghalya's HTML notification emails. */
+function ghalya_prepare_notification_mailer($phpmailer)
+{
+    if (empty($GLOBALS['ghalya_sending_notification']) || trim((string) $phpmailer->AltBody) !== '') {
+        return;
+    }
+
+    $plain_body = preg_replace(
+        '/<(?:br\s*\/?|\/p|\/div|\/tr|\/h[1-6]|\/table)>/i',
+        "\n",
+        (string) $phpmailer->Body
+    );
+    $plain_body = wp_strip_all_tags($plain_body);
+    $plain_body = html_entity_decode($plain_body, ENT_QUOTES, get_bloginfo('charset'));
+    $plain_body = preg_replace('/[ \t]+/', ' ', $plain_body);
+    $plain_body = preg_replace('/\n{3,}/', "\n\n", $plain_body);
+    $phpmailer->AltBody = trim($plain_body);
+}
+add_action('phpmailer_init', 'ghalya_prepare_notification_mailer', 20);
+
+/** Scope PHPMailer customization to messages created by this theme. */
+function ghalya_send_notification_email($recipient, $subject, $html, $headers)
+{
+    $GLOBALS['ghalya_sending_notification'] = true;
+
+    try {
+        return wp_mail($recipient, $subject, $html, $headers);
+    } finally {
+        unset($GLOBALS['ghalya_sending_notification']);
+    }
 }
 
 function ghalya_submission_recipient()
@@ -207,7 +263,7 @@ function ghalya_send_submission_notifications($post_id, $application, $language,
             'button_url' => admin_url('post.php?post=' . absint($post_id) . '&action=edit'),
             'button_label' => ghalya_notification_option('ghalya_email_review_button', 'Review application'),
         ));
-        $admin_sent = wp_mail(ghalya_submission_recipient(), $subject, $admin_email, ghalya_notification_headers($email));
+        $admin_sent = ghalya_send_notification_email(ghalya_submission_recipient(), $subject, $admin_email, ghalya_notification_headers($email));
         update_post_meta($post_id, '_ghalya_mail_status', $admin_sent ? 'sent' : 'failed');
     } else {
         update_post_meta($post_id, '_ghalya_mail_status', 'disabled');
@@ -231,7 +287,7 @@ function ghalya_send_submission_notifications($post_id, $application, $language,
             'button_url' => '',
             'button_label' => '',
         ));
-        $applicant_sent = wp_mail($email, $subject, $applicant_email, ghalya_notification_headers());
+        $applicant_sent = ghalya_send_notification_email($email, $subject, $applicant_email, ghalya_notification_headers());
         update_post_meta($post_id, '_ghalya_applicant_mail_status', $applicant_sent ? 'sent' : 'failed');
     } else {
         update_post_meta($post_id, '_ghalya_applicant_mail_status', 'disabled');

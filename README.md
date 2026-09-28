@@ -44,3 +44,7 @@ The dedicated **Ghalya Home Page** template and every application, success, and 
 The separate **Appearance → Ghalya content** page is not used. Shared navigation labels use the theme's WordPress translation files, while the language switcher displays the native language name configured under **Languages → Languages**. Gutenberg and the standard page content editor are disabled because this theme uses ACF as its page-editing interface.
 
 Notification subjects support `{name}`, `{email}`, and `{submission_id}` tokens. The branded responsive email uses the Customizer site logo and sends an application summary to administrators plus an English or Arabic confirmation to the applicant.
+
+### Email delivery
+
+Configure an authenticated SMTP or transactional email plugin in WordPress. In **Ghalya Submissions → Notifications**, use a sender address on the same domain authenticated by that service. Add the provider's SPF and DKIM records to DNS and publish a DMARC record for the sending domain. The theme supplies an aligned website-domain fallback sender and multipart HTML/plain-text content, but DNS authentication and mail transport must be configured by the hosting or email provider.

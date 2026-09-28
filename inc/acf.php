@@ -293,8 +293,16 @@ function ghalya_register_acf_options()
             array('key' => 'field_ghalya_applicant_email_message_ar', 'label' => __('Applicant message — Arabic', 'ghalya'), 'name' => 'ghalya_applicant_email_message_ar', 'type' => 'textarea', 'rows' => 4, 'new_lines' => ''),
             array('key' => 'field_ghalya_email_footer_en', 'label' => __('Email footer — English', 'ghalya'), 'name' => 'ghalya_email_footer_en', 'type' => 'textarea', 'rows' => 2, 'new_lines' => ''),
             array('key' => 'field_ghalya_email_footer_ar', 'label' => __('Email footer — Arabic', 'ghalya'), 'name' => 'ghalya_email_footer_ar', 'type' => 'textarea', 'rows' => 2, 'new_lines' => ''),
+            array(
+                'key' => 'field_ghalya_email_delivery_notice',
+                'label' => __('Email delivery', 'ghalya'),
+                'type' => 'message',
+                'message' => __('Use an authenticated SMTP or transactional email service. Set the sender email below to the same authenticated domain, then publish the SPF, DKIM, and DMARC records supplied by that service.', 'ghalya'),
+                'new_lines' => 'wpautop',
+                'esc_html' => 1,
+            ),
             array('key' => 'field_ghalya_email_from_name', 'label' => __('Sender name', 'ghalya'), 'name' => 'ghalya_email_from_name', 'type' => 'text'),
-            array('key' => 'field_ghalya_email_from_address', 'label' => __('Sender email', 'ghalya'), 'name' => 'ghalya_email_from_address', 'type' => 'email', 'instructions' => __('Leave blank to use the WordPress mail sender.', 'ghalya')),
+            array('key' => 'field_ghalya_email_from_address', 'label' => __('Sender email', 'ghalya'), 'name' => 'ghalya_email_from_address', 'type' => 'email', 'instructions' => __('Use the address authenticated by your SMTP service. If blank, the theme uses no-reply at the website domain.', 'ghalya')),
         ),
         'location' => array(array(array('param' => 'options_page', 'operator' => '==', 'value' => 'ghalya-email-settings'))),
     ));
