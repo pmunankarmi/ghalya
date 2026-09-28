@@ -26,7 +26,7 @@ $ghalya_is_landing = $ghalya_screen === 'home';
                 ));
             } else {
                 ?>
-                <img src="<?php echo esc_url(GHALYA_THEME_URI . '/assets/images/ghalya-logo.png'); ?>" alt="<?php echo esc_attr(get_bloginfo('name')); ?>" />
+                <img src="<?php echo esc_url(ghalya_asset_url('images/ghalya-logo.png')); ?>" alt="<?php echo esc_attr(get_bloginfo('name')); ?>" />
                 <?php
             }
             ?>

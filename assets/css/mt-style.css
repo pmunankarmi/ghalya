@@ -628,7 +628,7 @@ a {
   width: 20px;
   height: 20px;
   flex: 0 0 20px;
-  background: url("../images/check-icon.svg") center / contain no-repeat;
+  background: var(--ghalya-check-icon) center / contain no-repeat;
   content: "";
 }
 
@@ -687,13 +687,13 @@ a {
   width: 16px;
   height: 16px;
   margin-left: auto;
-  background-image: url("../images/plus-icon.svg") !important;
+  background-image: var(--ghalya-plus-icon) !important;
   background-position: center;
   background-size: contain;
   transform: none !important;
 }
 .mt-faq-button:not(.collapsed)::after {
-  background-image: url("../images/close-icon.svg") !important;
+  background-image: var(--ghalya-close-icon) !important;
 }
 .mt-faq-answer {
   padding: 0 1.25rem 1.2rem;
@@ -808,7 +808,7 @@ a {
   display: block;
   width: 16px;
   height: 16px;
-  background: url("../images/check-icon.svg") center / contain no-repeat;
+  background: var(--ghalya-check-icon) center / contain no-repeat;
   content: "";
 }
 
@@ -845,7 +845,7 @@ a {
   width: 18px;
   height: 18px;
   flex: 0 0 18px;
-  background: url("../images/chevron-left.svg") center / contain no-repeat;
+  background: var(--ghalya-chevron-left) center / contain no-repeat;
   content: "";
 }
 [dir="rtl"] .mt-form-top .mt-back-link::before {
@@ -1023,7 +1023,7 @@ a {
   width: 16px;
   height: 16px;
   flex: 0 0 16px;
-  background: url("../images/check-icon.svg") center / contain no-repeat;
+  background: var(--ghalya-check-icon) center / contain no-repeat;
   content: "";
 }
 .mt-tier-note {

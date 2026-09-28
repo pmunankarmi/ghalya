@@ -270,5 +270,11 @@ function ghalya_application_label($key)
 
 function ghalya_asset_url($path)
 {
-    return GHALYA_THEME_URI . '/assets/' . ltrim($path, '/');
+    $path = ltrim($path, '/');
+
+    if (strpos($path, 'images/') === 0) {
+        return ghalya_media_url(substr($path, 7));
+    }
+
+    return GHALYA_THEME_URI . '/assets/' . $path;
 }

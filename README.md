@@ -14,7 +14,7 @@ A bilingual WordPress conversion of the Ghalya creator-program HTML pack.
 
 1. Upload `ghalya-wordpress-theme.zip` in **Appearance → Themes → Add New → Upload Theme**.
 2. Activate ACF Pro and Polylang, then activate the theme.
-3. The theme creates connected English and Arabic pages for the landing page, Join the Community parent, five child form steps, success page, and terms page.
+3. The theme imports all 25 bundled images and SVG icons into the WordPress Media Library and creates connected English and Arabic pages for the landing page, Join the Community parent, five child form steps, success page, and terms page.
 4. In Polylang, confirm that English and Arabic are configured and choose the translated Ghalya landing pages as the front page if required.
 5. Configure administrator and applicant emails under **Ghalya Submissions → Notifications**. If the recipient is blank, the WordPress administration email is used.
 
@@ -37,7 +37,7 @@ Use **Export CSV** above the submissions table to download all records. The expo
 
 ## Content editing
 
-Select the site logo under **Appearance → Customize → Site Identity**. The bundled Ghalya logo remains as the fallback until a custom logo is selected.
+Select the site logo under **Appearance → Customize → Site Identity**. The imported Ghalya logo remains as the fallback until a custom logo is selected.
 
 The dedicated **Ghalya Home Page** template and every application, success, and terms page receive screen-specific ACF fields. Homepage fields are grouped into section tabs, and each Benefits or Deliverables card has its own optional icon image selector. Administrators edit plain text, labels, choices, and repeatable items such as benefits, FAQs, and terms sections. All HTML remains in the theme's `template-parts` files. English and Arabic pages keep independent content through Polylang.
 
@@ -50,3 +50,11 @@ Notification subjects support `{name}`, `{email}`, and `{submission_id}` tokens.
 ### Email delivery
 
 Configure an authenticated SMTP or transactional email plugin in WordPress. In **Ghalya Submissions → Notifications**, use a sender address on the same domain authenticated by that service. Add the provider's SPF and DKIM records to DNS and publish a DMARC record for the sending domain. The theme supplies an aligned website-domain fallback sender and multipart HTML/plain-text content, but DNS authentication and mail transport must be configured by the hosting or email provider.
+
+## Media Library migration (1.4.7)
+
+After installing this update, visit WordPress administration as an administrator with upload permissions. The theme copies all 25 originals from `inc/media` to the configured WordPress uploads directory and registers each as a Media Library attachment. Template images, email logos, and CSS icons resolve to those attachment URLs. Existing custom logos and ACF image choices are preserved.
+
+The import runs on activation or the first administrator visit after updating. Successful imports are recorded by attachment ID so subsequent visits do not duplicate them. Failed imports show an admin notice and retry on the next visit. Deleting a theme-owned attachment causes it to be restored on the next admin visit because the theme still needs it.
+
+The `inc/media` folder contains installation originals and temporary fallbacks, allowing fresh installations and recovery when uploads fail. Images are no longer served from `assets/images`. SVG import is limited to these trusted bundled files; general SVG uploads are not enabled. Fonts, scripts, and styles remain theme assets.

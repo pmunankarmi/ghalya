@@ -66,6 +66,8 @@ function ghalya_enqueue_assets()
     wp_enqueue_style('ghalya-swiper', GHALYA_THEME_URI . '/assets/vendor/swiper-bundle.min.css', array(), '12.0.3');
     wp_enqueue_style('ghalya-theme', GHALYA_THEME_URI . '/assets/css/mt-style.css', array('ghalya-bootstrap'), filemtime(GHALYA_THEME_PATH . '/assets/css/mt-style.css'));
 
+    ghalya_enqueue_media_styles();
+
     wp_enqueue_script('ghalya-bootstrap', GHALYA_THEME_URI . '/assets/vendor/bootstrap.bundle.min.js', array(), '5.3.3', true);
     wp_enqueue_script('ghalya-aos', GHALYA_THEME_URI . '/assets/vendor/aos.js', array(), '2.3.4', true);
     wp_enqueue_script('ghalya-swiper', GHALYA_THEME_URI . '/assets/vendor/swiper-bundle.min.js', array(), '12.0.3', true);
