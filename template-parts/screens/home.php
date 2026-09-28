@@ -198,7 +198,11 @@ $tier_copy = static function ($tier, $tier_key, $content_key) use ($content) {
           <div class="col-md-6 col-xl-3">
             <article class="mt-card" data-aos="fade-up"<?php echo $index ? ' data-aos-delay="' . esc_attr((string) ($index * 80)) . '"' : ''; ?>>
               <div class="mt-icon-shell" aria-hidden="true">
-                <?php if (isset($benefit_icons[$index])) : ?><img class="mt-feature-icon" src="<?php echo esc_url(ghalya_asset_url('images/' . $benefit_icons[$index])); ?>" alt="" /><?php endif; ?>
+                <?php if (!empty($benefit['icon'])) : ?>
+                  <?php echo wp_get_attachment_image(absint($benefit['icon']), 'thumbnail', false, array('class' => 'mt-feature-icon', 'alt' => '')); ?>
+                <?php elseif (isset($benefit_icons[$index])) : ?>
+                  <img class="mt-feature-icon" src="<?php echo esc_url(ghalya_asset_url('images/' . $benefit_icons[$index])); ?>" alt="" />
+                <?php endif; ?>
               </div>
               <h3><?php echo esc_html($benefit['title'] ?? ''); ?></h3>
               <p><?php echo esc_html($benefit['description'] ?? ''); ?></p>
@@ -222,7 +226,11 @@ $tier_copy = static function ($tier, $tier_key, $content_key) use ($content) {
               <div class="col-sm-6">
                 <article class="mt-card mt-deliver-card">
                   <div class="mt-deliver-icon-shell" aria-hidden="true">
-                    <?php if (isset($deliverable_icons[$index])) : ?><img src="<?php echo esc_url(ghalya_asset_url('images/' . $deliverable_icons[$index])); ?>" alt="" /><?php endif; ?>
+                    <?php if (!empty($deliverable['icon'])) : ?>
+                      <?php echo wp_get_attachment_image(absint($deliverable['icon']), 'thumbnail', false, array('alt' => '')); ?>
+                    <?php elseif (isset($deliverable_icons[$index])) : ?>
+                      <img src="<?php echo esc_url(ghalya_asset_url('images/' . $deliverable_icons[$index])); ?>" alt="" />
+                    <?php endif; ?>
                   </div>
                   <h3><?php echo esc_html($deliverable['title'] ?? ''); ?></h3>
                   <p><?php echo esc_html($deliverable['description'] ?? ''); ?></p>

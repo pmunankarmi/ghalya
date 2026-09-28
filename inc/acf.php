@@ -121,31 +121,19 @@ function ghalya_acf_application_fields($screen)
     return $fields;
 }
 
+function ghalya_acf_section_tab($name, $label)
+{
+    return array(
+        'key' => 'field_ghalya_home_tab_' . sanitize_key($name),
+        'label' => $label,
+        'type' => 'tab',
+        'placement' => 'top',
+    );
+}
+
 function ghalya_acf_home_fields()
 {
-    $fields = array();
-    $text_fields = array(
-        'hero_title' => 'Hero title', 'hero_accent' => 'Hero highlighted text', 'hero_eyebrow' => 'Hero eyebrow',
-        'creators_alt' => 'Creator image description', 'earn_note' => 'Earning note', 'reward_title' => 'Reward title',
-        'reward_amount' => 'Reward amount', 'reward_suffix' => 'Mobile reward suffix', 'reward_desktop_suffix' => 'Desktop reward suffix',
-        'reward_detail' => 'Reward details', 'join_button' => 'Join button', 'explore_button' => 'Explore button',
-        'tiers_label' => 'Tier-list description', 'partners_eyebrow' => 'Partners eyebrow', 'partners_title' => 'Partners title',
-        'partners_mobile_prefix' => 'Mobile universe prefix', 'partners_mobile_suffix' => 'Mobile universe suffix',
-        'partners_mobile_copy' => 'Mobile partners copy', 'partners_label' => 'Partner carousel description',
-        'benefits_eyebrow' => 'Benefits eyebrow', 'benefits_title' => 'Benefits title', 'deliver_eyebrow' => 'Deliverables eyebrow',
-        'deliver_title' => 'Deliverables title', 'looking_eyebrow' => 'Eligibility eyebrow', 'looking_title' => 'Eligibility title',
-        'categories_title' => 'Categories title', 'start_button' => 'Start button', 'faq_eyebrow' => 'FAQ eyebrow', 'faq_title' => 'FAQ title',
-    );
-
-    foreach ($text_fields as $name => $label) {
-        $fields[] = ghalya_acf_plain_field('home', $name, __($label, 'ghalya'));
-    }
-
-    foreach (array('hero_intro' => 'Hero introduction', 'hero_intro_emphasis' => 'Hero emphasized copy', 'benefits_intro' => 'Benefits introduction', 'faq_intro' => 'FAQ introduction') as $name => $label) {
-        $fields[] = ghalya_acf_plain_field('home', $name, __($label, 'ghalya'), 'textarea', array('rows' => 3, 'new_lines' => ''));
-    }
-
-    $fields[] = ghalya_acf_plain_field('home', 'tiers', __('Creator tiers', 'ghalya'), 'repeater', array(
+    $tier_field = ghalya_acf_plain_field('home', 'tiers', __('Creator tiers', 'ghalya'), 'repeater', array(
         'layout' => 'block',
         'button_label' => __('Add tier', 'ghalya'),
         'sub_fields' => array(
@@ -158,19 +146,25 @@ function ghalya_acf_home_fields()
         ),
     ));
 
-    foreach (array('benefits' => 'Benefits', 'deliverables' => 'Deliverables') as $name => $label) {
-        $fields[] = ghalya_acf_plain_field('home', $name, __($label, 'ghalya'), 'repeater', array(
-            'layout' => 'block',
-            'sub_fields' => array(
-                ghalya_acf_plain_field('home_' . rtrim($name, 's') . '_rows', 'title', __('Title', 'ghalya')),
-                ghalya_acf_plain_field('home_' . rtrim($name, 's') . '_rows', 'description', __('Description', 'ghalya'), 'textarea', array('rows' => 2, 'new_lines' => '')),
-            ),
-        ));
-    }
+    $benefits_field = ghalya_acf_plain_field('home', 'benefits', __('Benefits', 'ghalya'), 'repeater', array(
+        'layout' => 'block',
+        'sub_fields' => array(
+            ghalya_acf_plain_field('home_benefit_rows', 'icon', __('Icon', 'ghalya'), 'image', array('return_format' => 'id', 'preview_size' => 'thumbnail')),
+            ghalya_acf_plain_field('home_benefit_rows', 'title', __('Title', 'ghalya')),
+            ghalya_acf_plain_field('home_benefit_rows', 'description', __('Description', 'ghalya'), 'textarea', array('rows' => 2, 'new_lines' => '')),
+        ),
+    ));
 
-    $fields[] = ghalya_acf_text_rows('home', 'requirements', __('Eligibility requirements', 'ghalya'));
-    $fields[] = ghalya_acf_text_rows('home', 'categories', __('Creator categories', 'ghalya'));
-    $fields[] = ghalya_acf_plain_field('home', 'faqs', __('FAQs', 'ghalya'), 'repeater', array(
+    $deliverables_field = ghalya_acf_plain_field('home', 'deliverables', __('Deliverables', 'ghalya'), 'repeater', array(
+        'layout' => 'block',
+        'sub_fields' => array(
+            ghalya_acf_plain_field('home_deliverable_rows', 'icon', __('Icon', 'ghalya'), 'image', array('return_format' => 'id', 'preview_size' => 'thumbnail')),
+            ghalya_acf_plain_field('home_deliverable_rows', 'title', __('Title', 'ghalya')),
+            ghalya_acf_plain_field('home_deliverable_rows', 'description', __('Description', 'ghalya'), 'textarea', array('rows' => 2, 'new_lines' => '')),
+        ),
+    ));
+
+    $faqs_field = ghalya_acf_plain_field('home', 'faqs', __('FAQs', 'ghalya'), 'repeater', array(
         'layout' => 'block',
         'button_label' => __('Add FAQ', 'ghalya'),
         'sub_fields' => array(
@@ -179,7 +173,58 @@ function ghalya_acf_home_fields()
         ),
     ));
 
-    return $fields;
+    return array(
+        ghalya_acf_section_tab('hero_rewards', __('Hero & Rewards', 'ghalya')),
+        ghalya_acf_plain_field('home', 'hero_eyebrow', __('Hero eyebrow', 'ghalya')),
+        ghalya_acf_plain_field('home', 'hero_title', __('Hero title', 'ghalya')),
+        ghalya_acf_plain_field('home', 'hero_accent', __('Hero highlighted text', 'ghalya')),
+        ghalya_acf_plain_field('home', 'hero_intro', __('Hero introduction', 'ghalya'), 'textarea', array('rows' => 3, 'new_lines' => '')),
+        ghalya_acf_plain_field('home', 'hero_intro_emphasis', __('Hero emphasized copy', 'ghalya'), 'textarea', array('rows' => 3, 'new_lines' => '')),
+        ghalya_acf_plain_field('home', 'creators_alt', __('Creator image description', 'ghalya')),
+        ghalya_acf_plain_field('home', 'earn_note', __('Earning note', 'ghalya')),
+        ghalya_acf_plain_field('home', 'reward_title', __('Reward title', 'ghalya')),
+        ghalya_acf_plain_field('home', 'reward_amount', __('Default reward amount', 'ghalya')),
+        ghalya_acf_plain_field('home', 'reward_suffix', __('Default mobile reward suffix', 'ghalya')),
+        ghalya_acf_plain_field('home', 'reward_desktop_suffix', __('Default desktop reward suffix', 'ghalya')),
+        ghalya_acf_plain_field('home', 'reward_detail', __('Default reward details', 'ghalya')),
+        ghalya_acf_plain_field('home', 'tiers_label', __('Tier-list description', 'ghalya')),
+        $tier_field,
+        ghalya_acf_plain_field('home', 'join_button', __('Join button', 'ghalya')),
+        ghalya_acf_plain_field('home', 'explore_button', __('Explore button', 'ghalya')),
+
+        ghalya_acf_section_tab('partners', __('Partners', 'ghalya')),
+        ghalya_acf_plain_field('home', 'partners_eyebrow', __('Partners eyebrow', 'ghalya')),
+        ghalya_acf_plain_field('home', 'partners_title', __('Partners title', 'ghalya')),
+        ghalya_acf_plain_field('home', 'partners_mobile_prefix', __('Mobile universe prefix', 'ghalya')),
+        ghalya_acf_plain_field('home', 'partners_mobile_suffix', __('Mobile universe suffix', 'ghalya')),
+        ghalya_acf_plain_field('home', 'partners_mobile_copy', __('Mobile partners copy', 'ghalya')),
+        ghalya_acf_plain_field('home', 'partners_label', __('Partner carousel description', 'ghalya')),
+
+        ghalya_acf_section_tab('benefits', __('Benefits', 'ghalya')),
+        ghalya_acf_plain_field('home', 'benefits_eyebrow', __('Benefits eyebrow', 'ghalya')),
+        ghalya_acf_plain_field('home', 'benefits_title', __('Benefits title', 'ghalya')),
+        ghalya_acf_plain_field('home', 'benefits_intro', __('Benefits introduction', 'ghalya'), 'textarea', array('rows' => 3, 'new_lines' => '')),
+        $benefits_field,
+
+        ghalya_acf_section_tab('deliverables', __('Deliverables', 'ghalya')),
+        ghalya_acf_plain_field('home', 'deliver_eyebrow', __('Deliverables eyebrow', 'ghalya')),
+        ghalya_acf_plain_field('home', 'deliver_title', __('Deliverables title', 'ghalya')),
+        $deliverables_field,
+
+        ghalya_acf_section_tab('eligibility', __('Eligibility', 'ghalya')),
+        ghalya_acf_plain_field('home', 'looking_eyebrow', __('Eligibility eyebrow', 'ghalya')),
+        ghalya_acf_plain_field('home', 'looking_title', __('Eligibility title', 'ghalya')),
+        ghalya_acf_text_rows('home', 'requirements', __('Eligibility requirements', 'ghalya')),
+        ghalya_acf_plain_field('home', 'categories_title', __('Categories title', 'ghalya')),
+        ghalya_acf_text_rows('home', 'categories', __('Creator categories', 'ghalya')),
+        ghalya_acf_plain_field('home', 'start_button', __('Start button', 'ghalya')),
+
+        ghalya_acf_section_tab('faqs', __('FAQs', 'ghalya')),
+        ghalya_acf_plain_field('home', 'faq_eyebrow', __('FAQ eyebrow', 'ghalya')),
+        ghalya_acf_plain_field('home', 'faq_title', __('FAQ title', 'ghalya')),
+        ghalya_acf_plain_field('home', 'faq_intro', __('FAQ introduction', 'ghalya'), 'textarea', array('rows' => 3, 'new_lines' => '')),
+        $faqs_field,
+    );
 }
 
 function ghalya_register_acf_fields()
