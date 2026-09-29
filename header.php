@@ -2,6 +2,19 @@
 $ghalya_language = ghalya_current_language();
 $ghalya_screen = ghalya_current_screen();
 $ghalya_is_landing = $ghalya_screen === 'home';
+$ghalya_nav_sources = array('benefits' => 'Benefits', 'faqs' => 'FAQs', 'terms' => 'Terms');
+$ghalya_nav_arabic = array('benefits' => 'المزايا', 'faqs' => 'الأسئلة الشائعة', 'terms' => 'الشروط');
+$ghalya_nav_labels = array();
+
+foreach ($ghalya_nav_sources as $ghalya_nav_key => $ghalya_nav_source) {
+    $ghalya_nav_label = function_exists('pll__') ? pll__($ghalya_nav_source) : __($ghalya_nav_source, 'ghalya');
+
+    if ($ghalya_language === 'ar' && $ghalya_nav_label === $ghalya_nav_source) {
+        $ghalya_nav_label = $ghalya_nav_arabic[$ghalya_nav_key];
+    }
+
+    $ghalya_nav_labels[$ghalya_nav_key] = $ghalya_nav_label;
+}
 ?>
 <!doctype html>
 <html lang="<?php echo esc_attr($ghalya_language); ?>" dir="<?php echo $ghalya_language === 'ar' ? 'rtl' : 'ltr'; ?>">
@@ -33,10 +46,10 @@ $ghalya_is_landing = $ghalya_screen === 'home';
           </a>
           <div class="d-flex align-items-center <?php echo $ghalya_is_landing ? 'gap-4' : 'gap-3'; ?>">
             <?php if ($ghalya_is_landing) : ?>
-              <a class="mt-nav-link d-none d-md-inline" href="#benefits"><?php esc_html_e('Benefits', 'ghalya'); ?></a>
-              <a class="mt-nav-link d-none d-md-inline" href="#faq"><?php esc_html_e('FAQs', 'ghalya'); ?></a>
+              <a class="mt-nav-link d-none d-md-inline" href="#benefits"><?php echo esc_html($ghalya_nav_labels['benefits']); ?></a>
+              <a class="mt-nav-link d-none d-md-inline" href="#faq"><?php echo esc_html($ghalya_nav_labels['faqs']); ?></a>
             <?php endif; ?>
-            <a class="mt-nav-link d-none d-sm-inline" href="<?php echo esc_url(ghalya_page_url('terms', $ghalya_language)); ?>"><?php esc_html_e('Terms', 'ghalya'); ?></a>
+            <a class="mt-nav-link d-none d-sm-inline" href="<?php echo esc_url(ghalya_page_url('terms', $ghalya_language)); ?>"><?php echo esc_html($ghalya_nav_labels['terms']); ?></a>
             <a class="mt-lang-link" href="<?php echo esc_url(ghalya_language_switch_url()); ?>"><?php echo esc_html(ghalya_language_switch_name()); ?></a>
           </div>
         </div>

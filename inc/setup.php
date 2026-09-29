@@ -29,6 +29,9 @@ function ghalya_register_polylang_strings()
             'ghalya_application_back' => 'Back',
             'ghalya_application_continue' => 'Continue',
             'ghalya_application_submit' => 'Submit application',
+            'ghalya_navigation_benefits' => 'Benefits',
+            'ghalya_navigation_faqs' => 'FAQs',
+            'ghalya_navigation_terms' => 'Terms',
         );
 
         foreach ($labels as $name => $label) {

@@ -10,12 +10,6 @@ foreach ($tiers as $tier_index => $tier) {
         break;
     }
 }
-
-$tier_copy = static function ($tier, $tier_key, $content_key) use ($content) {
-    $value = isset($tier[$tier_key]) ? trim((string) $tier[$tier_key]) : '';
-
-    return $value !== '' ? $value : ghalya_content_text($content, $content_key);
-};
 ?>
 <section class="mt-hero">
     <div class="container position-relative">
@@ -57,6 +51,7 @@ $tier_copy = static function ($tier, $tier_key, $content_key) use ($content) {
         <div class="tab-content mt-tier-panels">
           <?php foreach ($tiers as $tier_index => $tier) :
               $is_active = $tier_index === $active_tier_index;
+              $reward_amount = !empty($tier['reward_amount']) ? (string) $tier['reward_amount'] : ghalya_content_text($content, 'reward_amount');
               ?>
             <div
               class="tab-pane fade<?php echo $is_active ? ' show active' : ''; ?>"
@@ -66,9 +61,9 @@ $tier_copy = static function ($tier, $tier_key, $content_key) use ($content) {
               tabindex="0"
             >
               <div class="mt-mobile-reward">
-                <strong><?php echo esc_html($tier_copy($tier, 'reward_amount', 'reward_amount')); ?></strong>
-                <?php echo esc_html($tier_copy($tier, 'reward_suffix', 'reward_suffix')); ?>
-                <small><?php echo esc_html($tier_copy($tier, 'reward_detail', 'reward_detail')); ?></small>
+                <strong><?php echo esc_html($reward_amount); ?></strong>
+                <?php echo esc_html(ghalya_content_text($content, 'reward_suffix')); ?>
+                <small><?php echo esc_html(ghalya_content_text($content, 'reward_detail')); ?></small>
               </div>
             </div>
           <?php endforeach; ?>
@@ -98,7 +93,6 @@ $tier_copy = static function ($tier, $tier_key, $content_key) use ($content) {
           </div>
           <div class="d-flex flex-wrap gap-3 pt-4">
             <a class="mt-btn-primary mt-community-join" href="<?php echo esc_url($profile_url); ?>"><?php echo esc_html(ghalya_content_text($content, 'join_button')); ?></a>
-            <a class="mt-btn-secondary" href="#benefits"><?php echo esc_html(ghalya_content_text($content, 'explore_button')); ?></a>
           </div>
         </div>
         <div class="col-lg-5" data-aos="fade-up" data-aos-delay="120">
@@ -127,6 +121,7 @@ $tier_copy = static function ($tier, $tier_key, $content_key) use ($content) {
             <div class="tab-content mt-tier-panels">
               <?php foreach ($tiers as $tier_index => $tier) :
                   $is_active = $tier_index === $active_tier_index;
+                  $reward_amount = !empty($tier['reward_amount']) ? (string) $tier['reward_amount'] : ghalya_content_text($content, 'reward_amount');
                   ?>
                 <div
                   class="tab-pane fade<?php echo $is_active ? ' show active' : ''; ?>"
@@ -139,12 +134,12 @@ $tier_copy = static function ($tier, $tier_key, $content_key) use ($content) {
                     <div class="d-flex justify-content-between align-items-end gap-3">
                       <div>
                         <div class="mt-reward-label"><?php echo esc_html(ghalya_content_text($content, 'reward_title')); ?></div>
-                        <p class="mt-reward-value"><?php echo esc_html($tier_copy($tier, 'reward_amount', 'reward_amount')); ?></p>
-                        <p class="mt-reward-small"><?php echo esc_html($tier_copy($tier, 'reward_desktop_suffix', 'reward_desktop_suffix')); ?></p>
+                        <p class="mt-reward-value"><?php echo esc_html($reward_amount); ?></p>
+                        <p class="mt-reward-small"><?php echo esc_html(ghalya_content_text($content, 'reward_desktop_suffix')); ?></p>
                       </div>
                       <span class="mt-arrow-dot"><img class="mt-reward-sparkle" src="<?php echo esc_url(ghalya_asset_url('images/sparkles-icon.svg')); ?>" alt="" /></span>
                     </div>
-                    <p class="mt-reward-small pt-3"><?php echo esc_html($tier_copy($tier, 'reward_detail', 'reward_detail')); ?></p>
+                    <p class="mt-reward-small pt-3"><?php echo esc_html(ghalya_content_text($content, 'reward_detail')); ?></p>
                   </div>
                 </div>
               <?php endforeach; ?>

@@ -1,6 +1,8 @@
 <?php
 $screen = isset($args['screen']) ? $args['screen'] : 'profile';
 $content = isset($args['content']) && is_array($args['content']) ? $args['content'] : array();
+$selected_tier = isset($args['selected_tier']) && is_array($args['selected_tier']) ? $args['selected_tier'] : array();
+$tiers = isset($args['tiers']) && is_array($args['tiers']) ? $args['tiers'] : array();
 $language = ghalya_current_language();
 $steps = array('profile', 'tier', 'work', 'proposal', 'contact');
 $step = array_search($screen, $steps, true);
@@ -17,6 +19,14 @@ $progress_step = array_search(get_queried_object_id(), $progress_page_ids, true)
 $progress_step = $progress_step === false ? $step : $progress_step;
 $total_steps = $progress_pages ? count($progress_pages) : count($steps);
 $step_label = sprintf(__('Step %1$d of %2$d', 'ghalya'), $progress_step + 1, $total_steps);
+$tier_label = isset($selected_tier['label']) ? trim((string) $selected_tier['label']) : '';
+$creator_label = ghalya_content_text($content, 'creator_label');
+$tier_name = ghalya_content_text($content, 'tier_name');
+$tier_amount = !empty($selected_tier['reward_amount']) ? (string) $selected_tier['reward_amount'] : ghalya_content_text($content, 'tier_amount');
+
+if ($tier_label !== '') {
+    $tier_name = $language === 'ar' ? trim($creator_label . ' ' . $tier_label) : trim($tier_label . ' ' . $creator_label);
+}
 ?>
 <main class="mt-form-page">
   <?php if ($is_contact && !empty($_GET['submission_error'])) : ?>
@@ -48,6 +58,7 @@ $step_label = sprintf(__('Step %1$d of %2$d', 'ghalya'), $progress_step + 1, $to
         class="mt-form-card mt-js-form"
         data-aos="fade-up"
         data-aos-delay="80"
+        <?php if ($screen === 'tier') : ?>data-mt-tier-options="<?php echo esc_attr(wp_json_encode($tiers)); ?>" data-mt-creator-label="<?php echo esc_attr($creator_label); ?>"<?php endif; ?>
         <?php if ($is_contact) : ?>data-mt-sendmail<?php else : ?>data-mt-next="<?php echo esc_url($next_url); ?>"<?php endif; ?>
         method="<?php echo $is_contact ? 'post' : 'get'; ?>"
       >
@@ -110,10 +121,12 @@ $step_label = sprintf(__('Step %1$d of %2$d', 'ghalya'), $progress_step + 1, $to
         <?php endif; ?>
 
         <?php if ($screen === 'tier') : ?>
-          <div class="mt-tier-name"><?php echo esc_html(ghalya_content_text($content, 'tier_name')); ?></div>
+          <input data-mt-tier-value name="assigned_tier" type="hidden" value="<?php echo esc_attr($tier_label); ?>" />
+          <input data-mt-tier-amount-value name="tier_amount" type="hidden" value="<?php echo esc_attr($tier_amount); ?>" />
+          <div class="mt-tier-name" data-mt-tier-name><?php echo esc_html($tier_name); ?></div>
           <div class="mt-tier-card">
             <div class="mt-tier-amount">
-              <?php echo esc_html(ghalya_content_text($content, 'tier_amount')); ?>
+              <strong data-mt-tier-amount><?php echo esc_html($tier_amount); ?></strong>
               <span><?php echo esc_html(ghalya_content_text($content, 'tier_suffix')); ?></span>
             </div>
           </div>

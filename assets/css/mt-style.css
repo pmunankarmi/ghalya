@@ -632,6 +632,40 @@ a {
   content: "";
 }
 
+.mt-eligibility-terms {
+  margin-top: 1.5rem;
+  padding: 1rem 1.15rem;
+  border-inline-start: 3px solid var(--mt-pink);
+  border-radius: 0 var(--mt-radius-sm) var(--mt-radius-sm) 0;
+  background: rgba(255, 255, 255, 0.64);
+}
+[dir="rtl"] .mt-eligibility-terms {
+  border-radius: var(--mt-radius-sm) 0 0 var(--mt-radius-sm);
+}
+.mt-eligibility-terms h3 {
+  margin: 0 0 0.45rem;
+  color: var(--mt-purple-deep);
+  font-size: 1rem;
+}
+.mt-eligibility-terms p {
+  margin: 0;
+  color: var(--mt-ink-soft);
+  font-size: 0.82rem;
+  line-height: 1.6;
+}
+.mt-eligibility-terms a,
+.mt-faq-answer a {
+  color: var(--mt-purple);
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 0.16em;
+}
+.mt-eligibility-terms a {
+  display: inline-block;
+  margin-top: 0.55rem;
+  font-size: 0.8rem;
+}
+
 .mt-chip-row {
   display: flex;
   flex-wrap: wrap;
@@ -993,6 +1027,11 @@ a {
   font-weight: 700;
   letter-spacing: -0.055em;
   line-height: 1.05;
+}
+.mt-tier-amount strong {
+  color: inherit;
+  font: inherit;
+  letter-spacing: inherit;
 }
 .mt-tier-amount span {
   color: var(--mt-purple);

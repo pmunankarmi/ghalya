@@ -77,6 +77,64 @@ function ghalya_application_step($application, $language, $step_number)
     return isset($application[$key]) && is_array($application[$key]) ? $application[$key] : array();
 }
 
+/** Resolve the submitted creator tier from the admin-managed Home page rows. */
+function ghalya_submission_tier($language, $profile)
+{
+    if (!function_exists('get_field')) {
+        return array();
+    }
+
+    $page_ids = get_option('ghalya_page_ids', array());
+    $home_id = isset($page_ids[$language]['home']) ? absint($page_ids[$language]['home']) : 0;
+
+    if (!$home_id) {
+        $home_id = absint(get_option('page_on_front'));
+
+        if ($home_id && function_exists('pll_get_post')) {
+            $translated_home_id = pll_get_post($home_id, $language);
+            $home_id = $translated_home_id ? absint($translated_home_id) : $home_id;
+        }
+    }
+
+    $home_content = $home_id ? get_field('ghalya_home_content', $home_id) : array();
+    $tiers = is_array($home_content) && !empty($home_content['tiers']) && is_array($home_content['tiers']) ? $home_content['tiers'] : array();
+
+    if (!$tiers) {
+        return array();
+    }
+
+    $selected_tier = reset($tiers);
+    $followers = isset($profile['followers']) ? (string) $profile['followers'] : '';
+    $categories = isset($profile['content_categories']) && is_array($profile['content_categories']) ? $profile['content_categories'] : array();
+    $generic_match = array();
+
+    foreach ($tiers as $tier) {
+        if (!empty($tier['active'])) {
+            $selected_tier = $tier;
+            break;
+        }
+    }
+
+    foreach ($tiers as $tier) {
+        if ((string) ($tier['profile_value'] ?? '') !== $followers) {
+            continue;
+        }
+
+        $configured_categories = array_filter(array_map('trim', explode(',', (string) ($tier['category_values'] ?? ''))));
+
+        if (!$configured_categories) {
+            $generic_match = $tier;
+            continue;
+        }
+
+        if (array_intersect($categories, $configured_categories)) {
+            return $tier;
+        }
+    }
+
+    return $generic_match ? $generic_match : $selected_tier;
+}
+
 function ghalya_application_is_complete($application, $language, $email, $phone)
 {
     $profile = ghalya_application_step($application, $language, 1);
@@ -329,6 +387,15 @@ function ghalya_handle_application_submission()
     $application[$contact_key]['terms'] = array('accepted');
 
     $profile = ghalya_application_step($application, $language, 1);
+    $tier = ghalya_submission_tier($language, $profile);
+
+    if ($tier) {
+        $tier_key = $language . ':mt-step-2';
+        $application[$tier_key] = isset($application[$tier_key]) && is_array($application[$tier_key]) ? $application[$tier_key] : array();
+        $application[$tier_key]['assigned_tier'] = sanitize_text_field((string) ($tier['label'] ?? ''));
+        $application[$tier_key]['tier_amount'] = sanitize_text_field((string) ($tier['reward_amount'] ?? ''));
+    }
+
     $full_name = sanitize_text_field($profile['full_name']);
     $post_id = wp_insert_post(array(
         'post_type' => 'ghalya_submission',
@@ -482,7 +549,7 @@ function ghalya_export_submissions()
 
     $output = fopen('php://output', 'w');
     fwrite($output, "\xEF\xBB\xBF");
-    fputcsv($output, array('ID', 'Submitted', 'Status', 'Language', 'Full name', 'Email', 'Phone', 'Instagram handle', 'Followers', 'City', 'Categories', 'Instagram URL', 'TikTok URL', 'Snapchat', 'Previous content', 'Brands', 'Availability', 'Admin mail status', 'Applicant mail status', 'Reviewer notes'));
+    fputcsv($output, array('ID', 'Submitted', 'Status', 'Language', 'Full name', 'Email', 'Phone', 'Instagram handle', 'Followers', 'City', 'Categories', 'Assigned tier', 'Tier amount', 'Instagram URL', 'TikTok URL', 'Snapchat', 'Previous content', 'Brands', 'Availability', 'Admin mail status', 'Applicant mail status', 'Reviewer notes'));
 
     foreach ($submissions as $submission) {
         $application = get_post_meta($submission->ID, '_ghalya_application', true);
@@ -501,6 +568,8 @@ function ghalya_export_submissions()
             ghalya_export_value($application, $language, 1, 'followers'),
             ghalya_export_value($application, $language, 1, 'city'),
             ghalya_export_value($application, $language, 1, 'content_categories'),
+            ghalya_export_value($application, $language, 2, 'assigned_tier'),
+            ghalya_export_value($application, $language, 2, 'tier_amount'),
             ghalya_export_value($application, $language, 3, 'instagram_url'),
             ghalya_export_value($application, $language, 3, 'tiktok_url'),
             ghalya_export_value($application, $language, 3, 'snapchat'),

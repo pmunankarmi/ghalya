@@ -10,6 +10,7 @@ $section_args = array(
     'content' => $content,
     'language' => ghalya_current_language(),
     'profile_url' => ghalya_page_url('profile'),
+    'terms_url' => ghalya_page_url('terms'),
 );
 
 get_header();

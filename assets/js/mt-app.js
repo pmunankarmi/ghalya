@@ -154,6 +154,100 @@
       });
   }
 
+  // Resolve the reward tier from the values saved on the Profile step.
+  function updateAssignedTier(form) {
+    var tierOptions = form.getAttribute("data-mt-tier-options");
+    var tiers;
+
+    if (!tierOptions) {
+      return;
+    }
+
+    try {
+      tiers = JSON.parse(tierOptions);
+    } catch (error) {
+      return;
+    }
+
+    if (!Array.isArray(tiers) || !tiers.length) {
+      return;
+    }
+
+    var language = document.documentElement.lang === "ar" ? "ar" : "en";
+    var profile = applicationState[language + ":mt-step-1"] || {};
+    var followerRange = profile.followers || "";
+    var categories = Array.isArray(profile.content_categories)
+      ? profile.content_categories
+      : [];
+    var selectedTier =
+      tiers.find(function (tier) {
+        return tier.active === true || String(tier.active) === "1";
+      }) || tiers[0];
+    var genericMatch = null;
+
+    tiers.some(function (tier) {
+      if (String(tier.profile_value || "") !== followerRange) {
+        return false;
+      }
+
+      var configuredCategories = String(tier.category_values || "")
+        .split(",")
+        .map(function (value) {
+          return value.trim();
+        })
+        .filter(Boolean);
+
+      if (!configuredCategories.length) {
+        genericMatch = tier;
+        return false;
+      }
+
+      if (
+        configuredCategories.some(function (value) {
+          return categories.indexOf(value) >= 0;
+        })
+      ) {
+        selectedTier = tier;
+        genericMatch = null;
+        return true;
+      }
+
+      return false;
+    });
+
+    if (genericMatch) {
+      selectedTier = genericMatch;
+    }
+
+    var label = String(selectedTier.label || "");
+    var amount = String(selectedTier.reward_amount || "");
+    var creatorLabel = form.getAttribute("data-mt-creator-label") || "";
+    var displayName =
+      language === "ar"
+        ? (creatorLabel + " " + label).trim()
+        : (label + " " + creatorLabel).trim();
+    var nameNode = form.querySelector("[data-mt-tier-name]");
+    var amountNode = form.querySelector("[data-mt-tier-amount]");
+    var valueField = form.querySelector("[data-mt-tier-value]");
+    var amountField = form.querySelector("[data-mt-tier-amount-value]");
+
+    if (nameNode) {
+      nameNode.textContent = displayName;
+    }
+
+    if (amountNode) {
+      amountNode.textContent = amount;
+    }
+
+    if (valueField) {
+      valueField.value = label;
+    }
+
+    if (amountField) {
+      amountField.value = amount;
+    }
+  }
+
   // The server adds this flag only after PHP has sent the application.
   if (new URLSearchParams(window.location.search).get("submitted") === "1") {
     clearApplicationState();
@@ -314,6 +408,7 @@
   // Restore saved values, then keep them current as the user edits each step.
   document.querySelectorAll(".mt-js-form").forEach(function (form) {
     restoreApplicationForm(form);
+    updateAssignedTier(form);
 
     form.addEventListener("input", function () {
       saveApplicationForm(form);

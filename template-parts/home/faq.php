@@ -1,13 +1,19 @@
 <?php
 $content = isset($args['content']) && is_array($args['content']) ? $args['content'] : array();
 $language = isset($args['language']) ? (string) $args['language'] : ghalya_current_language();
+$terms_url = isset($args['terms_url']) ? (string) $args['terms_url'] : '';
+$faq_title = ghalya_content_text($content, 'faq_title');
 ?>
 <section class="mt-section mt-section-white" id="faq" aria-labelledby="faq-title">
     <div class="container">
       <div class="row g-5">
         <div class="col-lg-4" data-aos="fade-up">
           <p class="mt-eyebrow"><?php echo esc_html(ghalya_content_text($content, 'faq_eyebrow')); ?></p>
-          <h2 class="mt-section-title" id="faq-title"><?php echo esc_html(ghalya_content_text($content, 'faq_title')); ?></h2>
+          <?php if ($faq_title !== '') : ?>
+            <h2 class="mt-section-title" id="faq-title"><?php echo esc_html($faq_title); ?></h2>
+          <?php else : ?>
+            <h2 class="visually-hidden" id="faq-title"><?php echo esc_html(ghalya_content_text($content, 'faq_eyebrow')); ?></h2>
+          <?php endif; ?>
           <?php if (ghalya_content_text($content, 'faq_intro') !== '') : ?><p class="mt-form-intro"><?php echo esc_html(ghalya_content_text($content, 'faq_intro')); ?></p><?php endif; ?>
         </div>
         <div class="col-lg-8" data-aos="fade-up" data-aos-delay="100">
@@ -24,7 +30,12 @@ $language = isset($args['language']) ? (string) $args['language'] : ghalya_curre
                   </button>
                 </h3>
                 <div id="<?php echo esc_attr($collapse_id); ?>" class="accordion-collapse collapse<?php echo $index ? '' : ' show'; ?>" aria-labelledby="<?php echo esc_attr($heading_id); ?>" data-bs-parent="#mtFaq-<?php echo esc_attr($language); ?>">
-                  <div class="accordion-body mt-faq-answer"><?php echo esc_html($faq['answer'] ?? ''); ?></div>
+                  <div class="accordion-body mt-faq-answer">
+                    <?php echo esc_html($faq['answer'] ?? ''); ?>
+                    <?php if ($terms_url !== '' && !empty($faq['terms_link_label'])) : ?>
+                      <a href="<?php echo esc_url($terms_url); ?>"><?php echo esc_html($faq['terms_link_label']); ?></a>
+                    <?php endif; ?>
+                  </div>
                 </div>
               </div>
             <?php endforeach; ?>

@@ -80,6 +80,9 @@ function ghalya_acf_application_fields($screen)
         $fields = array_merge($fields, array(
             ghalya_acf_plain_field($screen, 'tier_name', __('Tier name', 'ghalya')),
             ghalya_acf_plain_field($screen, 'tier_amount', __('Reward amount', 'ghalya')),
+            ghalya_acf_plain_field($screen, 'creator_label', __('Creator label', 'ghalya'), 'text', array(
+                'instructions' => __('Used with the selected homepage tier label, for example “Micro Creator”.', 'ghalya'),
+            )),
             ghalya_acf_plain_field($screen, 'tier_suffix', __('Reward description', 'ghalya')),
             ghalya_acf_plain_field($screen, 'deliverables_label', __('Deliverables heading', 'ghalya')),
             ghalya_acf_text_rows($screen, 'deliverables', __('Deliverables', 'ghalya')),
@@ -138,11 +141,14 @@ function ghalya_acf_home_fields()
         'button_label' => __('Add tier', 'ghalya'),
         'sub_fields' => array(
             ghalya_acf_plain_field('home_tier_rows', 'label', __('Label', 'ghalya')),
+            ghalya_acf_plain_field('home_tier_rows', 'profile_value', __('Follower choice value', 'ghalya'), 'text', array(
+                'instructions' => __('Match the Saved value under Profile → Follower choices, for example 10K-50K.', 'ghalya'),
+            )),
+            ghalya_acf_plain_field('home_tier_rows', 'category_values', __('Content category values', 'ghalya'), 'text', array(
+                'instructions' => __('Optional comma-separated Saved values from Profile → Content-category choices. Leave blank to match every category.', 'ghalya'),
+            )),
             ghalya_acf_plain_field('home_tier_rows', 'active', __('Active', 'ghalya'), 'true_false', array('ui' => 1)),
             ghalya_acf_plain_field('home_tier_rows', 'reward_amount', __('Reward amount', 'ghalya')),
-            ghalya_acf_plain_field('home_tier_rows', 'reward_suffix', __('Mobile reward suffix', 'ghalya')),
-            ghalya_acf_plain_field('home_tier_rows', 'reward_desktop_suffix', __('Desktop reward suffix', 'ghalya')),
-            ghalya_acf_plain_field('home_tier_rows', 'reward_detail', __('Reward details', 'ghalya'), 'textarea', array('rows' => 2, 'new_lines' => '')),
         ),
     ));
 
@@ -170,6 +176,9 @@ function ghalya_acf_home_fields()
         'sub_fields' => array(
             ghalya_acf_plain_field('home_faqs', 'question', __('Question', 'ghalya')),
             ghalya_acf_plain_field('home_faqs', 'answer', __('Answer', 'ghalya'), 'textarea', array('rows' => 3, 'new_lines' => '')),
+            ghalya_acf_plain_field('home_faqs', 'terms_link_label', __('Terms-page link label', 'ghalya'), 'text', array(
+                'instructions' => __('Optional. When entered, this text links to the translated Terms page after the answer.', 'ghalya'),
+            )),
         ),
     ));
 
@@ -190,7 +199,6 @@ function ghalya_acf_home_fields()
         ghalya_acf_plain_field('home', 'tiers_label', __('Tier-list description', 'ghalya')),
         $tier_field,
         ghalya_acf_plain_field('home', 'join_button', __('Join button', 'ghalya')),
-        ghalya_acf_plain_field('home', 'explore_button', __('Explore button', 'ghalya')),
 
         ghalya_acf_section_tab('partners', __('Partners', 'ghalya')),
         ghalya_acf_plain_field('home', 'partners_eyebrow', __('Partners eyebrow', 'ghalya')),
@@ -215,6 +223,9 @@ function ghalya_acf_home_fields()
         ghalya_acf_plain_field('home', 'looking_eyebrow', __('Eligibility eyebrow', 'ghalya')),
         ghalya_acf_plain_field('home', 'looking_title', __('Eligibility title', 'ghalya')),
         ghalya_acf_text_rows('home', 'requirements', __('Eligibility requirements', 'ghalya')),
+        ghalya_acf_plain_field('home', 'eligibility_terms_title', __('Terms and eligibility heading', 'ghalya')),
+        ghalya_acf_plain_field('home', 'eligibility_terms_text', __('Terms and eligibility summary', 'ghalya'), 'textarea', array('rows' => 3, 'new_lines' => '')),
+        ghalya_acf_plain_field('home', 'eligibility_terms_link_label', __('Terms-page link label', 'ghalya')),
         ghalya_acf_plain_field('home', 'categories_title', __('Categories title', 'ghalya')),
         ghalya_acf_text_rows('home', 'categories', __('Creator categories', 'ghalya')),
         ghalya_acf_plain_field('home', 'start_button', __('Start button', 'ghalya')),
@@ -363,7 +374,7 @@ function ghalya_seed_notification_options()
         'field_ghalya_applicant_notification_enabled' => array('ghalya_applicant_notification_enabled', 1),
         'field_ghalya_applicant_email_subject_en' => array('ghalya_applicant_email_subject_en', 'We received your Ghalya application'),
         'field_ghalya_applicant_email_subject_ar' => array('ghalya_applicant_email_subject_ar', 'تم استلام طلب الانضمام إلى غالية'),
-        'field_ghalya_applicant_email_heading_en' => array('ghalya_applicant_email_heading_en', 'Thank you for applying'),
+        'field_ghalya_applicant_email_heading_en' => array('ghalya_applicant_email_heading_en', 'Thank you for applying!'),
         'field_ghalya_applicant_email_heading_ar' => array('ghalya_applicant_email_heading_ar', 'شكرًا لتقديم طلبك'),
         'field_ghalya_applicant_email_message_en' => array('ghalya_applicant_email_message_en', 'Your application to join the Ghalya creator community has been received. Our team will review your details and contact you within 14 days.'),
         'field_ghalya_applicant_email_message_ar' => array('ghalya_applicant_email_message_ar', 'تم استلام طلبك للانضمام إلى مجتمع غالية لصنّاع المحتوى. سيراجع فريقنا بياناتك ويتواصل معك خلال 14 يومًا.'),
@@ -379,3 +390,138 @@ function ghalya_seed_notification_options()
     }
 }
 add_action('acf/init', 'ghalya_seed_notification_options', 20);
+
+/** Apply reviewed copy and new field defaults without replacing later admin edits. */
+function ghalya_apply_review_content_updates()
+{
+    if (!function_exists('get_field') || !function_exists('update_field') || get_option('ghalya_review_content_version') === '1') {
+        return;
+    }
+
+    $page_ids = get_option('ghalya_page_ids', array());
+
+    foreach (array('en', 'ar') as $language) {
+        $defaults = ghalya_default_content('home', $language);
+        $home_id = isset($page_ids[$language]['home']) ? absint($page_ids[$language]['home']) : 0;
+
+        if ($home_id) {
+            $home = get_field('ghalya_home_content', $home_id);
+
+            if (is_array($home)) {
+                foreach (array('eligibility_terms_title', 'eligibility_terms_text', 'eligibility_terms_link_label') as $field_name) {
+                    if (empty($home[$field_name])) {
+                        $home[$field_name] = $defaults[$field_name] ?? '';
+                    }
+                }
+
+                if ($language === 'ar' && ($home['faq_title'] ?? '') === 'كل ما تحتاج معرفته') {
+                    $home['faq_title'] = '';
+                }
+
+                if (!empty($home['tiers']) && is_array($home['tiers'])) {
+                    $old_amount = $language === 'ar' ? '2,000 ريال' : '2,000 SAR';
+                    $migrate_default_amounts = count($home['tiers']) === count($defaults['tiers']);
+
+                    foreach ($home['tiers'] as $existing_tier) {
+                        if (($existing_tier['reward_amount'] ?? '') !== $old_amount) {
+                            $migrate_default_amounts = false;
+                            break;
+                        }
+                    }
+
+                    foreach ($home['tiers'] as $index => &$tier) {
+                        $default_tier = $defaults['tiers'][$index] ?? array();
+
+                        if (empty($tier['profile_value'])) {
+                            $tier['profile_value'] = $default_tier['profile_value'] ?? '';
+                        }
+
+                        if (!isset($tier['category_values'])) {
+                            $tier['category_values'] = '';
+                        }
+
+                        if ($migrate_default_amounts && !empty($default_tier['reward_amount'])) {
+                            $tier['reward_amount'] = $default_tier['reward_amount'];
+                        }
+                    }
+                    unset($tier);
+                }
+
+                if (!empty($home['faqs']) && is_array($home['faqs'])) {
+                    $faq_question = $language === 'ar' ? 'ما هي حقوق المحتوى التي تحصل عليها العلامات؟' : 'What content rights do brands get?';
+                    $old_answer = $language === 'ar'
+                        ? 'يحتفظ صانع المحتوى بالملكية ويمنح حقوق استخدام محدودة وفقًا للشروط.'
+                        : 'Creators retain ownership and grant limited campaign usage rights as described in the terms.';
+                    $default_faq_index = array_key_last($defaults['faqs']);
+                    $default_faq = $default_faq_index !== null ? $defaults['faqs'][$default_faq_index] : array();
+
+                    foreach ($home['faqs'] as &$faq) {
+                        if (($faq['question'] ?? '') !== $faq_question) {
+                            continue;
+                        }
+
+                        if (($faq['answer'] ?? '') === $old_answer) {
+                            $faq['answer'] = $default_faq['answer'] ?? '';
+                        }
+
+                        if (empty($faq['terms_link_label'])) {
+                            $faq['terms_link_label'] = $default_faq['terms_link_label'] ?? '';
+                        }
+                    }
+                    unset($faq);
+                }
+
+                update_field('field_ghalya_home_content', $home, $home_id);
+            }
+        }
+
+        $tier_id = isset($page_ids[$language]['tier']) ? absint($page_ids[$language]['tier']) : 0;
+
+        if ($tier_id) {
+            $tier_content = get_field('ghalya_tier_content', $tier_id);
+
+            if (is_array($tier_content) && empty($tier_content['creator_label'])) {
+                $tier_defaults = ghalya_default_content('tier', $language);
+                $tier_content['creator_label'] = $tier_defaults['creator_label'] ?? '';
+                update_field('field_ghalya_tier_content', $tier_content, $tier_id);
+            }
+        }
+
+        $success_id = isset($page_ids[$language]['success']) ? absint($page_ids[$language]['success']) : 0;
+
+        if ($success_id) {
+            $success = get_field('ghalya_success_content', $success_id);
+            $old_message = 'Thank you for your interest in joining the Ghalya community. Expect a reply within 14 days.';
+
+            if ($language === 'en' && is_array($success) && ($success['message'] ?? '') === $old_message) {
+                $success_defaults = ghalya_default_content('success', 'en');
+                $success['message'] = $success_defaults['message'] ?? '';
+                update_field('field_ghalya_success_content', $success, $success_id);
+            }
+        }
+    }
+
+    $terms_id = isset($page_ids['ar']['terms']) ? absint($page_ids['ar']['terms']) : 0;
+
+    if ($terms_id) {
+        $terms = get_field('ghalya_terms_content', $terms_id);
+
+        if (is_array($terms) && !empty($terms['sections']) && is_array($terms['sections'])) {
+            foreach ($terms['sections'] as &$section) {
+                $section['title'] = str_replace('تسليمات', 'مخرجات', (string) ($section['title'] ?? ''));
+                $section['body'] = str_replace('التسليمات', 'المخرجات', (string) ($section['body'] ?? ''));
+            }
+            unset($section);
+            update_field('field_ghalya_terms_content', $terms, $terms_id);
+        }
+    }
+
+    $email_heading = get_field('ghalya_applicant_email_heading_en', 'option');
+
+    if ($email_heading === 'Thank you for applying') {
+        update_field('field_ghalya_applicant_email_heading_en', 'Thank you for applying!', 'option');
+    }
+
+    update_option('ghalya_review_content_version', '1', false);
+}
+add_action('admin_init', 'ghalya_apply_review_content_updates', 60);
