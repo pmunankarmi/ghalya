@@ -141,12 +141,6 @@ function ghalya_acf_home_fields()
         'button_label' => __('Add tier', 'ghalya'),
         'sub_fields' => array(
             ghalya_acf_plain_field('home_tier_rows', 'label', __('Label', 'ghalya')),
-            ghalya_acf_plain_field('home_tier_rows', 'profile_value', __('Follower choice value', 'ghalya'), 'text', array(
-                'instructions' => __('Match the Saved value under Profile → Follower choices, for example 10K-50K.', 'ghalya'),
-            )),
-            ghalya_acf_plain_field('home_tier_rows', 'category_values', __('Content category values', 'ghalya'), 'text', array(
-                'instructions' => __('Optional comma-separated Saved values from Profile → Content-category choices. Leave blank to match every category.', 'ghalya'),
-            )),
             ghalya_acf_plain_field('home_tier_rows', 'active', __('Active', 'ghalya'), 'true_false', array('ui' => 1)),
             ghalya_acf_plain_field('home_tier_rows', 'reward_amount', __('Reward amount', 'ghalya')),
         ),
@@ -431,14 +425,6 @@ function ghalya_apply_review_content_updates()
 
                     foreach ($home['tiers'] as $index => &$tier) {
                         $default_tier = $defaults['tiers'][$index] ?? array();
-
-                        if (empty($tier['profile_value'])) {
-                            $tier['profile_value'] = $default_tier['profile_value'] ?? '';
-                        }
-
-                        if (!isset($tier['category_values'])) {
-                            $tier['category_values'] = '';
-                        }
 
                         if ($migrate_default_amounts && !empty($default_tier['reward_amount'])) {
                             $tier['reward_amount'] = $default_tier['reward_amount'];

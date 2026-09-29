@@ -75,7 +75,7 @@ function ghalya_enqueue_assets()
     wp_enqueue_script('ghalya-aos', GHALYA_THEME_URI . '/assets/vendor/aos.js', array(), '2.3.4', true);
     wp_enqueue_script('ghalya-swiper', GHALYA_THEME_URI . '/assets/vendor/swiper-bundle.min.js', array(), '12.0.3', true);
     wp_enqueue_script('ghalya-validation', GHALYA_THEME_URI . '/assets/vendor/jquery.validate.js', array('jquery'), '1.21.0', true);
-    wp_enqueue_script('ghalya-app', GHALYA_THEME_URI . '/assets/js/mt-app.js', array('jquery', 'ghalya-validation', 'ghalya-aos', 'ghalya-swiper'), filemtime(GHALYA_THEME_PATH . '/assets/js/mt-app.js'), true);
+    wp_enqueue_script('ghalya-app', GHALYA_THEME_URI . '/assets/js/mt-app.js', array('jquery', 'ghalya-validation', 'ghalya-bootstrap', 'ghalya-aos', 'ghalya-swiper'), filemtime(GHALYA_THEME_PATH . '/assets/js/mt-app.js'), true);
 }
 add_action('wp_enqueue_scripts', 'ghalya_enqueue_assets');
 

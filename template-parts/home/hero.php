@@ -35,6 +35,7 @@ foreach ($tiers as $tier_index => $tier) {
         <div class="mt-tier-list" role="tablist" aria-label="<?php echo esc_attr(ghalya_content_text($content, 'tiers_label')); ?>">
           <?php foreach ($tiers as $tier_index => $tier) :
               $is_active = $tier_index === $active_tier_index;
+              $reward_amount = !empty($tier['reward_amount']) ? (string) $tier['reward_amount'] : ghalya_content_text($content, 'reward_amount');
               ?>
             <button
               class="mt-tier-pill<?php echo $is_active ? ' active' : ''; ?>"
@@ -45,6 +46,10 @@ foreach ($tiers as $tier_index => $tier) {
               data-bs-target="#mt-mobile-tier-panel-<?php echo esc_attr((string) $tier_index); ?>"
               aria-controls="mt-mobile-tier-panel-<?php echo esc_attr((string) $tier_index); ?>"
               aria-selected="<?php echo $is_active ? 'true' : 'false'; ?>"
+              data-mt-tier-choice
+              data-mt-tier-index="<?php echo esc_attr((string) $tier_index); ?>"
+              data-mt-tier-label="<?php echo esc_attr((string) ($tier['label'] ?? '')); ?>"
+              data-mt-tier-reward-amount="<?php echo esc_attr($reward_amount); ?>"
             ><?php echo esc_html($tier['label'] ?? ''); ?></button>
           <?php endforeach; ?>
         </div>
@@ -105,6 +110,7 @@ foreach ($tiers as $tier_index => $tier) {
             <div class="mt-tier-list" role="tablist" aria-label="<?php echo esc_attr(ghalya_content_text($content, 'tiers_label')); ?>">
               <?php foreach ($tiers as $tier_index => $tier) :
                   $is_active = $tier_index === $active_tier_index;
+                  $reward_amount = !empty($tier['reward_amount']) ? (string) $tier['reward_amount'] : ghalya_content_text($content, 'reward_amount');
                   ?>
                 <button
                   class="mt-tier-pill<?php echo $is_active ? ' active' : ''; ?>"
@@ -115,6 +121,10 @@ foreach ($tiers as $tier_index => $tier) {
                   data-bs-target="#mt-desktop-tier-panel-<?php echo esc_attr((string) $tier_index); ?>"
                   aria-controls="mt-desktop-tier-panel-<?php echo esc_attr((string) $tier_index); ?>"
                   aria-selected="<?php echo $is_active ? 'true' : 'false'; ?>"
+                  data-mt-tier-choice
+                  data-mt-tier-index="<?php echo esc_attr((string) $tier_index); ?>"
+                  data-mt-tier-label="<?php echo esc_attr((string) ($tier['label'] ?? '')); ?>"
+                  data-mt-tier-reward-amount="<?php echo esc_attr($reward_amount); ?>"
                 ><?php echo esc_html($tier['label'] ?? ''); ?></button>
               <?php endforeach; ?>
             </div>

@@ -154,69 +154,61 @@
       });
   }
 
-  // Resolve the reward tier from the values saved on the Profile step.
+  // Show the tier and price chosen on the homepage.
   function updateAssignedTier(form) {
     var tierOptions = form.getAttribute("data-mt-tier-options");
-    var tiers;
-
-    if (!tierOptions) {
-      return;
-    }
-
-    try {
-      tiers = JSON.parse(tierOptions);
-    } catch (error) {
-      return;
-    }
-
-    if (!Array.isArray(tiers) || !tiers.length) {
-      return;
-    }
-
+    var tiers = [];
     var language = document.documentElement.lang === "ar" ? "ar" : "en";
-    var profile = applicationState[language + ":mt-step-1"] || {};
-    var followerRange = profile.followers || "";
-    var categories = Array.isArray(profile.content_categories)
-      ? profile.content_categories
-      : [];
-    var selectedTier =
-      tiers.find(function (tier) {
-        return tier.active === true || String(tier.active) === "1";
-      }) || tiers[0];
-    var genericMatch = null;
+    var savedTier = applicationState[language + ":mt-selected-tier"] || {};
 
-    tiers.some(function (tier) {
-      if (String(tier.profile_value || "") !== followerRange) {
-        return false;
+    if (tierOptions) {
+      try {
+        tiers = JSON.parse(tierOptions);
+      } catch (error) {
+        tiers = [];
       }
+    }
 
-      var configuredCategories = String(tier.category_values || "")
-        .split(",")
-        .map(function (value) {
-          return value.trim();
-        })
-        .filter(Boolean);
+    if (!Array.isArray(tiers)) {
+      tiers = [];
+    }
 
-      if (!configuredCategories.length) {
-        genericMatch = tier;
-        return false;
-      }
+    var selectedTier = null;
+
+    // Match the saved homepage selection against the latest admin tier rows.
+    if (Object.prototype.hasOwnProperty.call(savedTier, "tier_index")) {
+      var selectedIndex = parseInt(savedTier.tier_index, 10);
 
       if (
-        configuredCategories.some(function (value) {
-          return categories.indexOf(value) >= 0;
-        })
+        !Number.isNaN(selectedIndex) &&
+        tiers[selectedIndex] &&
+        (!savedTier.label ||
+          String(tiers[selectedIndex].label || "") === String(savedTier.label))
       ) {
-        selectedTier = tier;
-        genericMatch = null;
-        return true;
+        selectedTier = tiers[selectedIndex];
       }
+    }
 
-      return false;
-    });
+    if (!selectedTier && savedTier.label) {
+      selectedTier =
+        tiers.find(function (tier) {
+          return String(tier.label || "") === String(savedTier.label);
+        }) || null;
+    }
 
-    if (genericMatch) {
-      selectedTier = genericMatch;
+    if (!selectedTier && (savedTier.label || savedTier.reward_amount)) {
+      selectedTier = savedTier;
+    }
+
+    if (!selectedTier && tiers.length) {
+      selectedTier =
+        tiers.find(function (tier) {
+          return tier.active === true || String(tier.active) === "1";
+        }) || tiers[0];
+    }
+
+    if (!selectedTier) {
+      return;
     }
 
     var label = String(selectedTier.label || "");
@@ -235,7 +227,7 @@
       nameNode.textContent = displayName;
     }
 
-    if (amountNode) {
+    if (amountNode && amount) {
       amountNode.textContent = amount;
     }
 
@@ -243,8 +235,75 @@
       valueField.value = label;
     }
 
-    if (amountField) {
+    if (amountField && amount) {
       amountField.value = amount;
+    }
+  }
+
+  // Remember the homepage tier tab and keep both responsive tab groups aligned.
+  function setupTierChoices() {
+    var buttons = Array.from(document.querySelectorAll("[data-mt-tier-choice]"));
+
+    if (!buttons.length) {
+      return;
+    }
+
+    var language = document.documentElement.lang === "ar" ? "ar" : "en";
+    var storageKey = language + ":mt-selected-tier";
+    var savedTier = applicationState[storageKey] || {};
+    var syncingTabs = false;
+
+    function saveChoice(button) {
+      applicationState[storageKey] = {
+        tier_index: button.getAttribute("data-mt-tier-index") || "0",
+        label: button.getAttribute("data-mt-tier-label") || "",
+        reward_amount:
+          button.getAttribute("data-mt-tier-reward-amount") || "",
+      };
+      writeApplicationState();
+    }
+
+    function showChoiceInBothLayouts(tierIndex) {
+      if (typeof window.bootstrap === "undefined" || !window.bootstrap.Tab) {
+        return;
+      }
+
+      syncingTabs = true;
+
+      buttons.forEach(function (button) {
+        if (button.getAttribute("data-mt-tier-index") === String(tierIndex)) {
+          window.bootstrap.Tab.getOrCreateInstance(button).show();
+        }
+      });
+
+      syncingTabs = false;
+    }
+
+    buttons.forEach(function (button) {
+      button.addEventListener("click", function () {
+        saveChoice(button);
+      });
+
+      button.addEventListener("shown.bs.tab", function () {
+        saveChoice(button);
+
+        if (!syncingTabs) {
+          showChoiceInBothLayouts(button.getAttribute("data-mt-tier-index"));
+        }
+      });
+    });
+
+    if (Object.prototype.hasOwnProperty.call(savedTier, "tier_index")) {
+      showChoiceInBothLayouts(savedTier.tier_index);
+      return;
+    }
+
+    var activeButton = buttons.find(function (button) {
+      return button.classList.contains("active");
+    });
+
+    if (activeButton) {
+      saveChoice(activeButton);
     }
   }
 
@@ -257,6 +316,8 @@
   document.querySelectorAll("[data-mt-year]").forEach(function (node) {
     node.textContent = new Date().getFullYear();
   });
+
+  setupTierChoices();
 
   // Reveal key page sections as they enter the viewport.
   if (typeof window.AOS !== "undefined") {

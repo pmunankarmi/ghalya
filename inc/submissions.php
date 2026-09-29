@@ -78,7 +78,7 @@ function ghalya_application_step($application, $language, $step_number)
 }
 
 /** Resolve the submitted creator tier from the admin-managed Home page rows. */
-function ghalya_submission_tier($language, $profile)
+function ghalya_submission_tier($language, $application = array())
 {
     if (!function_exists('get_field')) {
         return array();
@@ -104,9 +104,25 @@ function ghalya_submission_tier($language, $profile)
     }
 
     $selected_tier = reset($tiers);
-    $followers = isset($profile['followers']) ? (string) $profile['followers'] : '';
-    $categories = isset($profile['content_categories']) && is_array($profile['content_categories']) ? $profile['content_categories'] : array();
-    $generic_match = array();
+    $selection_key = $language . ':mt-selected-tier';
+    $saved_tier = isset($application[$selection_key]) && is_array($application[$selection_key]) ? $application[$selection_key] : array();
+
+    if (isset($saved_tier['tier_index'])) {
+        $saved_index = absint($saved_tier['tier_index']);
+        $saved_label = (string) ($saved_tier['label'] ?? '');
+
+        if (isset($tiers[$saved_index]) && ($saved_label === '' || (string) ($tiers[$saved_index]['label'] ?? '') === $saved_label)) {
+            return $tiers[$saved_index];
+        }
+    }
+
+    if (!empty($saved_tier['label'])) {
+        foreach ($tiers as $tier) {
+            if ((string) ($tier['label'] ?? '') === (string) $saved_tier['label']) {
+                return $tier;
+            }
+        }
+    }
 
     foreach ($tiers as $tier) {
         if (!empty($tier['active'])) {
@@ -115,24 +131,7 @@ function ghalya_submission_tier($language, $profile)
         }
     }
 
-    foreach ($tiers as $tier) {
-        if ((string) ($tier['profile_value'] ?? '') !== $followers) {
-            continue;
-        }
-
-        $configured_categories = array_filter(array_map('trim', explode(',', (string) ($tier['category_values'] ?? ''))));
-
-        if (!$configured_categories) {
-            $generic_match = $tier;
-            continue;
-        }
-
-        if (array_intersect($categories, $configured_categories)) {
-            return $tier;
-        }
-    }
-
-    return $generic_match ? $generic_match : $selected_tier;
+    return $selected_tier;
 }
 
 function ghalya_application_is_complete($application, $language, $email, $phone)
@@ -387,7 +386,9 @@ function ghalya_handle_application_submission()
     $application[$contact_key]['terms'] = array('accepted');
 
     $profile = ghalya_application_step($application, $language, 1);
-    $tier = ghalya_submission_tier($language, $profile);
+    $tier = ghalya_submission_tier($language, $application);
+
+    unset($application['en:mt-selected-tier'], $application['ar:mt-selected-tier']);
 
     if ($tier) {
         $tier_key = $language . ':mt-step-2';
