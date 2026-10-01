@@ -14,6 +14,7 @@ if (!in_array($screen, $allowed_screens, true)) {
 $content = function_exists('get_field') ? get_field('ghalya_' . $screen . '_content', $page_id) : array();
 $content = is_array($content) ? $content : array();
 $selected_tier = array();
+$selected_tier_index = 0;
 $tiers = array();
 
 if ($screen === 'tier' && function_exists('get_field')) {
@@ -39,57 +40,23 @@ if ($screen === 'tier' && function_exists('get_field')) {
     $home_content = $home_id ? get_field('ghalya_home_content', $home_id) : array();
     $tiers = is_array($home_content) && !empty($home_content['tiers']) && is_array($home_content['tiers']) ? $home_content['tiers'] : array();
 
-    foreach ($tiers as $tier) {
-        if (!empty($tier['active'])) {
-            $selected_tier = $tier;
-            break;
-        }
-    }
-
-    if (!$selected_tier && $tiers) {
-        $selected_tier = reset($tiers);
-    }
-
     $saved_application = isset($_COOKIE['mt_ghalya_application']) ? wp_unslash($_COOKIE['mt_ghalya_application']) : '';
+    $application = array();
 
     if ($saved_application !== '' && strlen($saved_application) <= 100000) {
         if (strpos($saved_application, '%7B') === 0 || strpos($saved_application, '%7b') === 0) {
             $saved_application = rawurldecode($saved_application);
         }
 
-        $application = json_decode($saved_application, true, 20);
-        $selection_key = $language . ':mt-selected-tier';
-        $saved_tier = is_array($application) && isset($application[$selection_key]) && is_array($application[$selection_key]) ? $application[$selection_key] : array();
-        $has_saved_tier = false;
+        $decoded_application = json_decode($saved_application, true, 20);
+        $application = is_array($decoded_application) ? $decoded_application : array();
+    }
 
-        if (isset($saved_tier['tier_index'])) {
-            $saved_index = absint($saved_tier['tier_index']);
-            $saved_label = sanitize_text_field((string) ($saved_tier['label'] ?? ''));
+    $selected_tier = ghalya_assigned_tier($language, $application, $tiers);
+    $matched_tier_index = array_search($selected_tier, $tiers, true);
 
-            if (isset($tiers[$saved_index]) && ($saved_label === '' || (string) ($tiers[$saved_index]['label'] ?? '') === $saved_label)) {
-                $selected_tier = $tiers[$saved_index];
-                $has_saved_tier = true;
-            }
-        }
-
-        if (!$has_saved_tier && !empty($saved_tier['label'])) {
-            $saved_label = sanitize_text_field((string) $saved_tier['label']);
-
-            foreach ($tiers as $tier) {
-                if ((string) ($tier['label'] ?? '') === $saved_label) {
-                    $selected_tier = $tier;
-                    $has_saved_tier = true;
-                    break;
-                }
-            }
-        }
-
-        if (!$has_saved_tier && (!empty($saved_tier['label']) || !empty($saved_tier['reward_amount']))) {
-            $selected_tier = array(
-                'label' => sanitize_text_field((string) ($saved_tier['label'] ?? '')),
-                'reward_amount' => sanitize_text_field((string) ($saved_tier['reward_amount'] ?? '')),
-            );
-        }
+    if ($matched_tier_index !== false) {
+        $selected_tier_index = (int) $matched_tier_index;
     }
 }
 
@@ -98,6 +65,7 @@ get_template_part('template-parts/screens/application', null, array(
     'screen' => $screen,
     'content' => $content,
     'selected_tier' => $selected_tier,
+    'selected_tier_index' => $selected_tier_index,
     'tiers' => $tiers,
 ));
 get_footer();

@@ -176,6 +176,52 @@ function ghalya_content_rows($content, $key)
     return isset($content[$key]) && is_array($content[$key]) ? $content[$key] : array();
 }
 
+/** Match the selected follower range to the tier in the same list position. */
+function ghalya_assigned_tier($language, $application = array(), $tiers = array())
+{
+    if (!function_exists('get_field')) {
+        return array();
+    }
+
+    $language = in_array($language, array('en', 'ar'), true) ? $language : 'en';
+    $page_ids = get_option('ghalya_page_ids', array());
+
+    if (!$tiers) {
+        $home_id = isset($page_ids[$language]['home']) ? absint($page_ids[$language]['home']) : 0;
+        $home_content = $home_id ? get_field('ghalya_home_content', $home_id) : array();
+        $tiers = is_array($home_content) ? ghalya_content_rows($home_content, 'tiers') : array();
+    }
+
+    if (!$tiers) {
+        return array();
+    }
+
+    $profile_id = isset($page_ids[$language]['profile']) ? absint($page_ids[$language]['profile']) : 0;
+    $profile_content = $profile_id ? get_field('ghalya_profile_content', $profile_id) : array();
+
+    if (!is_array($profile_content) || !$profile_content) {
+        $profile_content = ghalya_default_content('profile', $language);
+    }
+
+    $profile_key = $language . ':mt-step-1';
+    $profile = isset($application[$profile_key]) && is_array($application[$profile_key]) ? $application[$profile_key] : array();
+    $followers = sanitize_text_field((string) ($profile['followers'] ?? ''));
+
+    foreach (ghalya_content_rows($profile_content, 'followers_choices') as $index => $choice) {
+        if ($followers !== '' && $followers === (string) ($choice['value'] ?? '') && isset($tiers[$index])) {
+            return $tiers[$index];
+        }
+    }
+
+    foreach ($tiers as $tier) {
+        if (!empty($tier['active'])) {
+            return $tier;
+        }
+    }
+
+    return reset($tiers);
+}
+
 /** Fetch the direct application pages beneath the translated Join parent. */
 function ghalya_application_pages($language = '')
 {

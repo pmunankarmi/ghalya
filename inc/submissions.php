@@ -77,61 +77,10 @@ function ghalya_application_step($application, $language, $step_number)
     return isset($application[$key]) && is_array($application[$key]) ? $application[$key] : array();
 }
 
-/** Resolve the submitted creator tier from the admin-managed Home page rows. */
+/** Resolve the submitted creator tier from the selected profile follower range. */
 function ghalya_submission_tier($language, $application = array())
 {
-    if (!function_exists('get_field')) {
-        return array();
-    }
-
-    $page_ids = get_option('ghalya_page_ids', array());
-    $home_id = isset($page_ids[$language]['home']) ? absint($page_ids[$language]['home']) : 0;
-
-    if (!$home_id) {
-        $home_id = absint(get_option('page_on_front'));
-
-        if ($home_id && function_exists('pll_get_post')) {
-            $translated_home_id = pll_get_post($home_id, $language);
-            $home_id = $translated_home_id ? absint($translated_home_id) : $home_id;
-        }
-    }
-
-    $home_content = $home_id ? get_field('ghalya_home_content', $home_id) : array();
-    $tiers = is_array($home_content) && !empty($home_content['tiers']) && is_array($home_content['tiers']) ? $home_content['tiers'] : array();
-
-    if (!$tiers) {
-        return array();
-    }
-
-    $selected_tier = reset($tiers);
-    $selection_key = $language . ':mt-selected-tier';
-    $saved_tier = isset($application[$selection_key]) && is_array($application[$selection_key]) ? $application[$selection_key] : array();
-
-    if (isset($saved_tier['tier_index'])) {
-        $saved_index = absint($saved_tier['tier_index']);
-        $saved_label = (string) ($saved_tier['label'] ?? '');
-
-        if (isset($tiers[$saved_index]) && ($saved_label === '' || (string) ($tiers[$saved_index]['label'] ?? '') === $saved_label)) {
-            return $tiers[$saved_index];
-        }
-    }
-
-    if (!empty($saved_tier['label'])) {
-        foreach ($tiers as $tier) {
-            if ((string) ($tier['label'] ?? '') === (string) $saved_tier['label']) {
-                return $tier;
-            }
-        }
-    }
-
-    foreach ($tiers as $tier) {
-        if (!empty($tier['active'])) {
-            $selected_tier = $tier;
-            break;
-        }
-    }
-
-    return $selected_tier;
+    return ghalya_assigned_tier($language, $application);
 }
 
 function ghalya_application_is_complete($application, $language, $email, $phone)

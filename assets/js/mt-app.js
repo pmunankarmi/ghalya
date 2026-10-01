@@ -154,12 +154,11 @@
       });
   }
 
-  // Show the tier and price chosen on the homepage.
+  // Keep the rendered tier fields aligned with the profile-based PHP assignment.
   function updateAssignedTier(form) {
     var tierOptions = form.getAttribute("data-mt-tier-options");
     var tiers = [];
     var language = document.documentElement.lang === "ar" ? "ar" : "en";
-    var savedTier = applicationState[language + ":mt-selected-tier"] || {};
 
     if (tierOptions) {
       try {
@@ -173,39 +172,13 @@
       tiers = [];
     }
 
-    var selectedTier = null;
-
-    // Match the saved homepage selection against the latest admin tier rows.
-    if (Object.prototype.hasOwnProperty.call(savedTier, "tier_index")) {
-      var selectedIndex = parseInt(savedTier.tier_index, 10);
-
-      if (
-        !Number.isNaN(selectedIndex) &&
-        tiers[selectedIndex] &&
-        (!savedTier.label ||
-          String(tiers[selectedIndex].label || "") === String(savedTier.label))
-      ) {
-        selectedTier = tiers[selectedIndex];
-      }
-    }
-
-    if (!selectedTier && savedTier.label) {
-      selectedTier =
-        tiers.find(function (tier) {
-          return String(tier.label || "") === String(savedTier.label);
-        }) || null;
-    }
-
-    if (!selectedTier && (savedTier.label || savedTier.reward_amount)) {
-      selectedTier = savedTier;
-    }
-
-    if (!selectedTier && tiers.length) {
-      selectedTier =
-        tiers.find(function (tier) {
-          return tier.active === true || String(tier.active) === "1";
-        }) || tiers[0];
-    }
+    var selectedIndex = parseInt(
+      form.getAttribute("data-mt-assigned-tier-index") || "0",
+      10,
+    );
+    var selectedTier = Number.isNaN(selectedIndex)
+      ? tiers[0]
+      : tiers[selectedIndex];
 
     if (!selectedTier) {
       return;
@@ -240,7 +213,7 @@
     }
   }
 
-  // Remember the homepage tier tab and keep both responsive tab groups aligned.
+  // Keep responsive homepage tier tabs aligned without saving an application value.
   function setupTierChoices() {
     var buttons = Array.from(document.querySelectorAll("[data-mt-tier-choice]"));
 
@@ -248,20 +221,7 @@
       return;
     }
 
-    var language = document.documentElement.lang === "ar" ? "ar" : "en";
-    var storageKey = language + ":mt-selected-tier";
-    var savedTier = applicationState[storageKey] || {};
     var syncingTabs = false;
-
-    function saveChoice(button) {
-      applicationState[storageKey] = {
-        tier_index: button.getAttribute("data-mt-tier-index") || "0",
-        label: button.getAttribute("data-mt-tier-label") || "",
-        reward_amount:
-          button.getAttribute("data-mt-tier-reward-amount") || "",
-      };
-      writeApplicationState();
-    }
 
     function showChoiceInBothLayouts(tierIndex) {
       if (typeof window.bootstrap === "undefined" || !window.bootstrap.Tab) {
@@ -280,30 +240,27 @@
     }
 
     buttons.forEach(function (button) {
-      button.addEventListener("click", function () {
-        saveChoice(button);
-      });
-
       button.addEventListener("shown.bs.tab", function () {
-        saveChoice(button);
-
         if (!syncingTabs) {
           showChoiceInBothLayouts(button.getAttribute("data-mt-tier-index"));
         }
       });
     });
 
-    if (Object.prototype.hasOwnProperty.call(savedTier, "tier_index")) {
-      showChoiceInBothLayouts(savedTier.tier_index);
-      return;
-    }
-
-    var activeButton = buttons.find(function (button) {
-      return button.classList.contains("active");
-    });
-
-    if (activeButton) {
-      saveChoice(activeButton);
+    // Remove selections saved by older theme versions without touching form data.
+    if (
+      Object.prototype.hasOwnProperty.call(
+        applicationState,
+        "en:mt-selected-tier",
+      ) ||
+      Object.prototype.hasOwnProperty.call(
+        applicationState,
+        "ar:mt-selected-tier",
+      )
+    ) {
+      delete applicationState["en:mt-selected-tier"];
+      delete applicationState["ar:mt-selected-tier"];
+      writeApplicationState();
     }
   }
 

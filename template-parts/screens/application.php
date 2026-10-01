@@ -2,6 +2,7 @@
 $screen = isset($args['screen']) ? $args['screen'] : 'profile';
 $content = isset($args['content']) && is_array($args['content']) ? $args['content'] : array();
 $selected_tier = isset($args['selected_tier']) && is_array($args['selected_tier']) ? $args['selected_tier'] : array();
+$selected_tier_index = isset($args['selected_tier_index']) ? absint($args['selected_tier_index']) : 0;
 $tiers = isset($args['tiers']) && is_array($args['tiers']) ? $args['tiers'] : array();
 $language = ghalya_current_language();
 $steps = array('profile', 'tier', 'work', 'proposal', 'contact');
@@ -58,7 +59,7 @@ if ($tier_label !== '') {
         class="mt-form-card mt-js-form"
         data-aos="fade-up"
         data-aos-delay="80"
-        <?php if ($screen === 'tier') : ?>data-mt-tier-options="<?php echo esc_attr(wp_json_encode($tiers)); ?>" data-mt-creator-label="<?php echo esc_attr($creator_label); ?>"<?php endif; ?>
+        <?php if ($screen === 'tier') : ?>data-mt-tier-options="<?php echo esc_attr(wp_json_encode($tiers)); ?>" data-mt-assigned-tier-index="<?php echo esc_attr((string) $selected_tier_index); ?>" data-mt-creator-label="<?php echo esc_attr($creator_label); ?>"<?php endif; ?>
         <?php if ($is_contact) : ?>data-mt-sendmail<?php else : ?>data-mt-next="<?php echo esc_url($next_url); ?>"<?php endif; ?>
         method="<?php echo $is_contact ? 'post' : 'get'; ?>"
       >

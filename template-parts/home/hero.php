@@ -48,8 +48,6 @@ foreach ($tiers as $tier_index => $tier) {
               aria-selected="<?php echo $is_active ? 'true' : 'false'; ?>"
               data-mt-tier-choice
               data-mt-tier-index="<?php echo esc_attr((string) $tier_index); ?>"
-              data-mt-tier-label="<?php echo esc_attr((string) ($tier['label'] ?? '')); ?>"
-              data-mt-tier-reward-amount="<?php echo esc_attr($reward_amount); ?>"
             ><?php echo esc_html($tier['label'] ?? ''); ?></button>
           <?php endforeach; ?>
         </div>
@@ -123,8 +121,6 @@ foreach ($tiers as $tier_index => $tier) {
                   aria-selected="<?php echo $is_active ? 'true' : 'false'; ?>"
                   data-mt-tier-choice
                   data-mt-tier-index="<?php echo esc_attr((string) $tier_index); ?>"
-                  data-mt-tier-label="<?php echo esc_attr((string) ($tier['label'] ?? '')); ?>"
-                  data-mt-tier-reward-amount="<?php echo esc_attr($reward_amount); ?>"
                 ><?php echo esc_html($tier['label'] ?? ''); ?></button>
               <?php endforeach; ?>
             </div>
