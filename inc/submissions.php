@@ -163,6 +163,19 @@ function ghalya_application_is_complete($application, $language, $email, $phone)
         return false;
     }
 
+    $availability = (string) $proposal['availability'];
+    $availability_date = DateTimeImmutable::createFromFormat('!Y-m-d', $availability, wp_timezone());
+    $date_errors = DateTimeImmutable::getLastErrors();
+
+    if (
+        !$availability_date
+        || ($date_errors && ($date_errors['warning_count'] || $date_errors['error_count']))
+        || $availability_date->format('Y-m-d') !== $availability
+        || $availability_date < new DateTimeImmutable('today', wp_timezone())
+    ) {
+        return false;
+    }
+
     return is_email($email) && strlen($phone) >= 8 && strlen($phone) <= 40;
 }
 

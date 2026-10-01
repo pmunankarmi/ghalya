@@ -178,7 +178,7 @@ if ($tier_label !== '') {
           </div>
           <div class="mt-field mt-4">
             <label class="mt-label" for="availability"><?php echo esc_html(ghalya_content_text($content, 'availability_label')); ?></label>
-            <input class="mt-input" id="availability" name="availability" required type="date" />
+            <input class="mt-input" id="availability" min="<?php echo esc_attr(current_time('Y-m-d')); ?>" name="availability" required type="date" />
           </div>
         <?php endif; ?>
 
