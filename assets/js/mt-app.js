@@ -322,10 +322,13 @@
   // Reveal key page sections as they enter the viewport.
   if (typeof window.AOS !== "undefined") {
     window.AOS.init({
-      duration: 650,
+      duration: 420,
       easing: "ease-out-cubic",
-      offset: 48,
+      offset: 24,
       once: true,
+      debounceDelay: 100,
+      throttleDelay: 150,
+      disableMutationObserver: true,
       disable: function () {
         return (
           window.matchMedia("(prefers-reduced-motion: reduce)").matches ||
