@@ -314,8 +314,8 @@ function ghalya_register_acf_options()
     }
 
     acf_add_options_sub_page(array(
-        'page_title' => __('Ghalya notification settings', 'ghalya'), 'menu_title' => __('Notifications', 'ghalya'),
-        'parent_slug' => 'edit.php?post_type=ghalya_submission', 'menu_slug' => 'ghalya-email-settings', 'capability' => 'manage_options',
+        'page_title' => __('Ghalya Theme Options', 'ghalya'), 'menu_title' => __('Theme Options', 'ghalya'),
+        'parent_slug' => 'themes.php', 'menu_slug' => 'ghalya-theme-options', 'capability' => 'manage_options',
     ));
 
     acf_add_local_field_group(array(
@@ -347,7 +347,7 @@ function ghalya_register_acf_options()
             array('key' => 'field_ghalya_email_from_name', 'label' => __('Sender name', 'ghalya'), 'name' => 'ghalya_email_from_name', 'type' => 'text'),
             array('key' => 'field_ghalya_email_from_address', 'label' => __('Sender email', 'ghalya'), 'name' => 'ghalya_email_from_address', 'type' => 'email', 'instructions' => __('Use the address authenticated by your SMTP service. If blank, the theme uses no-reply at the website domain.', 'ghalya')),
         ),
-        'location' => array(array(array('param' => 'options_page', 'operator' => '==', 'value' => 'ghalya-email-settings'))),
+        'location' => array(array(array('param' => 'options_page', 'operator' => '==', 'value' => 'ghalya-theme-options'))),
     ));
 }
 add_action('acf/init', 'ghalya_register_acf_options');
