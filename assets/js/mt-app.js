@@ -327,7 +327,10 @@
       offset: 48,
       once: true,
       disable: function () {
-        return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+        return (
+          window.matchMedia("(prefers-reduced-motion: reduce)").matches ||
+          window.matchMedia("(max-width: 767.98px)").matches
+        );
       },
     });
 
@@ -491,7 +494,7 @@
         "(prefers-reduced-motion: reduce)",
       ).matches;
 
-      new window.Swiper(slider, {
+      var partnerSwiper = new window.Swiper(slider, {
         slidesPerView: 4.35,
         spaceBetween: 8,
         grabCursor: true,
@@ -521,6 +524,61 @@
           },
         },
       });
+
+      if (reduceMotion || !partnerSwiper.autoplay) {
+        return;
+      }
+
+      var isCarouselVisible = false;
+      var isPageScrolling = false;
+      var scrollTimer;
+
+      // Only run autoplay while the carousel can be seen and scrolling is idle.
+      function updateCarouselMotion() {
+        if (
+          isCarouselVisible &&
+          !isPageScrolling &&
+          document.visibilityState === "visible"
+        ) {
+          partnerSwiper.autoplay.start();
+        } else {
+          partnerSwiper.autoplay.stop();
+        }
+      }
+
+      if ("IntersectionObserver" in window) {
+        var carouselObserver = new IntersectionObserver(
+          function (entries) {
+            isCarouselVisible = entries[0].isIntersecting;
+            updateCarouselMotion();
+          },
+          { rootMargin: "80px 0px", threshold: 0.05 },
+        );
+
+        carouselObserver.observe(slider);
+      } else {
+        isCarouselVisible = true;
+      }
+
+      window.addEventListener(
+        "scroll",
+        function () {
+          if (!isPageScrolling) {
+            isPageScrolling = true;
+            updateCarouselMotion();
+          }
+
+          window.clearTimeout(scrollTimer);
+          scrollTimer = window.setTimeout(function () {
+            isPageScrolling = false;
+            updateCarouselMotion();
+          }, 160);
+        },
+        { passive: true },
+      );
+
+      document.addEventListener("visibilitychange", updateCarouselMotion);
+      updateCarouselMotion();
     });
   }
 })();

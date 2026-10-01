@@ -24,6 +24,15 @@
   }
 }
 
+/* Mobile pages stay responsive by skipping scroll-triggered transforms. */
+@media (max-width: 767.98px) {
+  [data-aos] {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+}
+
 @font-face {
   font-family: "MT Lexend";
   src: url("../fonts/Lexend-Light.woff2") format("woff2");
@@ -1459,12 +1468,14 @@ a {
     box-shadow: none;
     font-size: 16px;
     font-weight: 400;
-    transform: translateX(-50%);
+    transform: translate3d(-50%, 0, 0);
+    backface-visibility: hidden;
+    will-change: transform;
     white-space: nowrap;
   }
 
   .mt-mobile-join:hover {
-    transform: translateX(-50%) translateY(-2px);
+    transform: translate3d(-50%, -2px, 0);
   }
 
   .mt-hero .g-5,

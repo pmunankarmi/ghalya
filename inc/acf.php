@@ -146,6 +146,19 @@ function ghalya_acf_home_fields()
         ),
     ));
 
+    $partner_logos_field = ghalya_acf_plain_field('home', 'partner_logos', __('Partner logos', 'ghalya'), 'repeater', array(
+        'layout' => 'table',
+        'button_label' => __('Add partner logo', 'ghalya'),
+        'sub_fields' => array(
+            ghalya_acf_plain_field('home_partner_logo_rows', 'logo', __('Logo', 'ghalya'), 'image', array(
+                'return_format' => 'id',
+                'preview_size' => 'thumbnail',
+                'library' => 'all',
+            )),
+            ghalya_acf_plain_field('home_partner_logo_rows', 'name', __('Partner name', 'ghalya')),
+        ),
+    ));
+
     $benefits_field = ghalya_acf_plain_field('home', 'benefits', __('Benefits', 'ghalya'), 'repeater', array(
         'layout' => 'block',
         'sub_fields' => array(
@@ -201,6 +214,7 @@ function ghalya_acf_home_fields()
         ghalya_acf_plain_field('home', 'partners_mobile_suffix', __('Mobile universe suffix', 'ghalya')),
         ghalya_acf_plain_field('home', 'partners_mobile_copy', __('Mobile partners copy', 'ghalya')),
         ghalya_acf_plain_field('home', 'partners_label', __('Partner carousel description', 'ghalya')),
+        $partner_logos_field,
 
         ghalya_acf_section_tab('benefits', __('Benefits', 'ghalya')),
         ghalya_acf_plain_field('home', 'benefits_eyebrow', __('Benefits eyebrow', 'ghalya')),
@@ -511,3 +525,55 @@ function ghalya_apply_review_content_updates()
     update_option('ghalya_review_content_version', '1', false);
 }
 add_action('admin_init', 'ghalya_apply_review_content_updates', 60);
+
+/** Populate the new logo repeater with the bundled partner logos once. */
+function ghalya_seed_partner_logos()
+{
+    if (!function_exists('get_field') || !function_exists('update_field') || get_option('ghalya_partner_logos_version') === '1') {
+        return;
+    }
+
+    $attachments = get_option('ghalya_media_attachments', array());
+    $logo_files = array(
+        'delsey-paris.png' => 'Delsey Paris',
+        'kipling.png' => 'Kipling',
+        'danube.png' => 'Danube',
+        'zahrat-alrawdah.png' => 'Zahrat Al Rawdah',
+        'bindawood.png' => 'BinDawood',
+    );
+    $rows = array();
+
+    foreach ($logo_files as $filename => $name) {
+        $attachment_id = isset($attachments[$filename]) ? absint($attachments[$filename]) : 0;
+
+        if (!$attachment_id || get_post_type($attachment_id) !== 'attachment') {
+            return;
+        }
+
+        $rows[] = array('logo' => $attachment_id, 'name' => $name);
+    }
+
+    $page_ids = get_option('ghalya_page_ids', array());
+    $found_home_page = false;
+
+    foreach (array('en', 'ar') as $language) {
+        $home_id = isset($page_ids[$language]['home']) ? absint($page_ids[$language]['home']) : 0;
+
+        if (!$home_id || !get_post_status($home_id)) {
+            continue;
+        }
+
+        $found_home_page = true;
+        $home = get_field('ghalya_home_content', $home_id);
+
+        if (is_array($home) && empty($home['partner_logos'])) {
+            $home['partner_logos'] = $rows;
+            update_field('field_ghalya_home_content', $home, $home_id);
+        }
+    }
+
+    if ($found_home_page) {
+        update_option('ghalya_partner_logos_version', '1', false);
+    }
+}
+add_action('admin_init', 'ghalya_seed_partner_logos', 70);

@@ -1,7 +1,18 @@
 <?php
 $content = isset($args['content']) && is_array($args['content']) ? $args['content'] : array();
-$partner_images = array('delsey-paris.png', 'kipling.png', 'danube.png', 'zahrat-alrawdah.png', 'bindawood.png');
-$partner_slides = array_merge($partner_images, $partner_images);
+$partner_logos = ghalya_content_rows($content, 'partner_logos');
+
+if (!$partner_logos) {
+    $partner_logos = array(
+        array('file' => 'delsey-paris.png', 'name' => 'Delsey Paris'),
+        array('file' => 'kipling.png', 'name' => 'Kipling'),
+        array('file' => 'danube.png', 'name' => 'Danube'),
+        array('file' => 'zahrat-alrawdah.png', 'name' => 'Zahrat Al Rawdah'),
+        array('file' => 'bindawood.png', 'name' => 'BinDawood'),
+    );
+}
+
+$partner_slides = array_merge($partner_logos, $partner_logos);
 ?>
 <section class="mt-section mt-section-white mt-partners-section" aria-labelledby="partners-title">
     <div class="container">
@@ -17,8 +28,16 @@ $partner_slides = array_merge($partner_images, $partner_images);
       </div>
       <div class="swiper mt-partner-swiper" data-aos="fade-up" data-aos-delay="100" aria-label="<?php echo esc_attr(ghalya_content_text($content, 'partners_label')); ?>">
         <div class="swiper-wrapper">
-          <?php foreach ($partner_slides as $partner_image) : ?>
-            <div class="swiper-slide"><div class="mt-partner"><img src="<?php echo esc_url(ghalya_asset_url('images/' . $partner_image)); ?>" alt="" /></div></div>
+          <?php foreach ($partner_slides as $partner_logo) : ?>
+            <div class="swiper-slide">
+              <div class="mt-partner">
+                <?php if (!empty($partner_logo['logo'])) : ?>
+                  <?php echo wp_get_attachment_image(absint($partner_logo['logo']), 'medium', false, array('alt' => (string) ($partner_logo['name'] ?? ''))); ?>
+                <?php elseif (!empty($partner_logo['file'])) : ?>
+                  <img src="<?php echo esc_url(ghalya_asset_url('images/' . $partner_logo['file'])); ?>" alt="<?php echo esc_attr((string) ($partner_logo['name'] ?? '')); ?>" />
+                <?php endif; ?>
+              </div>
+            </div>
           <?php endforeach; ?>
         </div>
       </div>
