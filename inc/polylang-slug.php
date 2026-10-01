@@ -72,29 +72,31 @@ function polylang_slug_unique_slug_in_language( $slug, $post_ID, $post_status, $
 		return $slug;
 	}
 
-	$join_clause  = polylang_slug_model_post_join_clause();
-	$where_clause = polylang_slug_model_post_where_clause( $lang );
-
 	if ( is_post_type_hierarchical( $post_type ) ) {
-
-		// Page slugs must be unique within their own trees. Pages are in a separate
-		// namespace than posts so page slugs are allowed to overlap post slugs.
-		$check_sql = "SELECT ID FROM $wpdb->posts $join_clause WHERE post_name = %s AND post_type IN ( %s, 'attachment' ) AND ID != %d AND post_parent = %d $where_clause LIMIT 1";
-		$post_name_check = $wpdb->get_var( $wpdb->prepare( $check_sql, $original_slug, $post_type, $post_ID, $post_parent ) );
-
+		$check_sql = "SELECT ID FROM $wpdb->posts WHERE post_name = %s AND post_type IN ( %s, 'attachment' ) AND ID != %d AND post_parent = %d";
+		$candidate_ids = $wpdb->get_col( $wpdb->prepare( $check_sql, $original_slug, $post_type, $post_ID, $post_parent ) );
 	} else {
-
-		// Post slugs must be unique across all posts.
-		$check_sql = "SELECT post_name FROM $wpdb->posts $join_clause WHERE post_name = %s AND post_type = %s AND ID != %d $where_clause LIMIT 1";
-		$post_name_check = $wpdb->get_var( $wpdb->prepare( $check_sql, $original_slug, $post_type, $post_ID ) );
-
+		$check_sql = "SELECT ID FROM $wpdb->posts WHERE post_name = %s AND post_type = %s AND ID != %d";
+		$candidate_ids = $wpdb->get_col( $wpdb->prepare( $check_sql, $original_slug, $post_type, $post_ID ) );
 	}
 
-	if ( ! $post_name_check ) {
-		return $original_slug;
+	// Public Polylang APIs are stable across versions; its internal SQL aliases are not.
+	foreach ( $candidate_ids as $candidate_id ) {
+		$candidate_id = (int) $candidate_id;
+
+		if ( 'attachment' === get_post_type( $candidate_id ) ) {
+			return $slug;
+		}
+
+		$candidate_lang = pll_get_post_language( $candidate_id );
+
+		// An untranslated collision or one in the same language must remain unique.
+		if ( empty( $candidate_lang ) || $candidate_lang === $lang ) {
+			return $slug;
+		}
 	}
 
-	return $slug;
+	return $original_slug;
 }
 add_filter( 'wp_unique_post_slug', 'polylang_slug_unique_slug_in_language', 10, 6 );
 
