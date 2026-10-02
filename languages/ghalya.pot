@@ -1,0 +1,44 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: Ghalya Creator Program 1.4.6\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-09-28 00:00+0545\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Domain: ghalya\n"
+
+#: header.php
+msgid "Benefits"
+msgstr ""
+
+#: header.php
+msgid "FAQs"
+msgstr ""
+
+#: header.php
+msgid "Terms"
+msgstr ""
+
+#: inc/helpers.php
+msgid "Previous"
+msgstr ""
+
+#: inc/helpers.php
+msgid "Back"
+msgstr ""
+
+#: inc/helpers.php
+msgid "Continue"
+msgstr ""
+
+#: inc/helpers.php
+msgid "Submit application"
+msgstr ""
+
+#: template-parts/screens/application.php
+msgid "Step %1$d of %2$d"
+msgstr ""

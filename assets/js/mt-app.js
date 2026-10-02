@@ -154,6 +154,116 @@
       });
   }
 
+  // Keep the rendered tier fields aligned with the profile-based PHP assignment.
+  function updateAssignedTier(form) {
+    var tierOptions = form.getAttribute("data-mt-tier-options");
+    var tiers = [];
+    var language = document.documentElement.lang === "ar" ? "ar" : "en";
+
+    if (tierOptions) {
+      try {
+        tiers = JSON.parse(tierOptions);
+      } catch (error) {
+        tiers = [];
+      }
+    }
+
+    if (!Array.isArray(tiers)) {
+      tiers = [];
+    }
+
+    var selectedIndex = parseInt(
+      form.getAttribute("data-mt-assigned-tier-index") || "0",
+      10,
+    );
+    var selectedTier = Number.isNaN(selectedIndex)
+      ? tiers[0]
+      : tiers[selectedIndex];
+
+    if (!selectedTier) {
+      return;
+    }
+
+    var label = String(selectedTier.label || "");
+    var amount = String(selectedTier.reward_amount || "");
+    var creatorLabel = form.getAttribute("data-mt-creator-label") || "";
+    var displayName =
+      language === "ar"
+        ? (creatorLabel + " " + label).trim()
+        : (label + " " + creatorLabel).trim();
+    var nameNode = form.querySelector("[data-mt-tier-name]");
+    var amountNode = form.querySelector("[data-mt-tier-amount]");
+    var valueField = form.querySelector("[data-mt-tier-value]");
+    var amountField = form.querySelector("[data-mt-tier-amount-value]");
+
+    if (nameNode) {
+      nameNode.textContent = displayName;
+    }
+
+    if (amountNode && amount) {
+      amountNode.textContent = amount;
+    }
+
+    if (valueField) {
+      valueField.value = label;
+    }
+
+    if (amountField && amount) {
+      amountField.value = amount;
+    }
+  }
+
+  // Keep responsive homepage tier tabs aligned without saving an application value.
+  function setupTierChoices() {
+    var buttons = Array.from(document.querySelectorAll("[data-mt-tier-choice]"));
+
+    if (!buttons.length) {
+      return;
+    }
+
+    var syncingTabs = false;
+
+    function showChoiceInBothLayouts(tierIndex) {
+      if (typeof window.bootstrap === "undefined" || !window.bootstrap.Tab) {
+        return;
+      }
+
+      syncingTabs = true;
+
+      buttons.forEach(function (button) {
+        if (button.getAttribute("data-mt-tier-index") === String(tierIndex)) {
+          window.bootstrap.Tab.getOrCreateInstance(button).show();
+        }
+      });
+
+      syncingTabs = false;
+    }
+
+    buttons.forEach(function (button) {
+      button.addEventListener("shown.bs.tab", function () {
+        if (!syncingTabs) {
+          showChoiceInBothLayouts(button.getAttribute("data-mt-tier-index"));
+        }
+      });
+    });
+
+    // Remove selections saved by older theme versions without touching form data.
+    if (
+      Object.prototype.hasOwnProperty.call(
+        applicationState,
+        "en:mt-selected-tier",
+      ) ||
+      Object.prototype.hasOwnProperty.call(
+        applicationState,
+        "ar:mt-selected-tier",
+      )
+    ) {
+      delete applicationState["en:mt-selected-tier"];
+      delete applicationState["ar:mt-selected-tier"];
+      writeApplicationState();
+    }
+  }
+
   // The server adds this flag only after PHP has sent the application.
   if (new URLSearchParams(window.location.search).get("submitted") === "1") {
     clearApplicationState();
@@ -164,15 +274,23 @@
     node.textContent = new Date().getFullYear();
   });
 
+  setupTierChoices();
+
   // Reveal key page sections as they enter the viewport.
   if (typeof window.AOS !== "undefined") {
     window.AOS.init({
-      duration: 650,
+      duration: 420,
       easing: "ease-out-cubic",
-      offset: 48,
+      offset: 24,
       once: true,
+      debounceDelay: 100,
+      throttleDelay: 150,
+      disableMutationObserver: true,
       disable: function () {
-        return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+        return (
+          window.matchMedia("(prefers-reduced-motion: reduce)").matches ||
+          window.matchMedia("(max-width: 767.98px)").matches
+        );
       },
     });
 
@@ -278,7 +396,6 @@
       input.className = "mt-input";
       input.id = inputId;
       input.name = "brand_content_url_" + linkCount;
-      input.required = true;
       input.type = "url";
       input.placeholder = button.getAttribute("data-mt-placeholder");
 
@@ -286,13 +403,12 @@
       field.appendChild(input);
       container.appendChild(field);
 
-      // Register the new optional URL with the active validator.
+      // Register the additional URL with the active validator.
       if (
         typeof window.jQuery !== "undefined" &&
         typeof window.jQuery.fn.validate === "function"
       ) {
         window.jQuery(input).rules("add", {
-          required: true,
           url: true,
         });
       }
@@ -316,6 +432,7 @@
   // Restore saved values, then keep them current as the user edits each step.
   document.querySelectorAll(".mt-js-form").forEach(function (form) {
     restoreApplicationForm(form);
+    updateAssignedTier(form);
 
     form.addEventListener("input", function () {
       saveApplicationForm(form);
@@ -333,11 +450,24 @@
   // Turn each partner strip into a touch-friendly logo carousel.
   if (typeof window.Swiper !== "undefined") {
     document.querySelectorAll(".mt-partner-swiper").forEach(function (slider) {
-      new window.Swiper(slider, {
+      var reduceMotion = window.matchMedia(
+        "(prefers-reduced-motion: reduce)",
+      ).matches;
+
+      var partnerSwiper = new window.Swiper(slider, {
         slidesPerView: 4.35,
         spaceBetween: 8,
         grabCursor: true,
-        watchOverflow: true,
+        loop: true,
+        speed: 850,
+        watchOverflow: false,
+        autoplay: reduceMotion
+          ? false
+          : {
+              delay: 1800,
+              disableOnInteraction: false,
+              pauseOnMouseEnter: true,
+            },
         freeMode: {
           enabled: true,
           momentumRatio: 0.65,
@@ -354,6 +484,61 @@
           },
         },
       });
+
+      if (reduceMotion || !partnerSwiper.autoplay) {
+        return;
+      }
+
+      var isCarouselVisible = false;
+      var isPageScrolling = false;
+      var scrollTimer;
+
+      // Only run autoplay while the carousel can be seen and scrolling is idle.
+      function updateCarouselMotion() {
+        if (
+          isCarouselVisible &&
+          !isPageScrolling &&
+          document.visibilityState === "visible"
+        ) {
+          partnerSwiper.autoplay.start();
+        } else {
+          partnerSwiper.autoplay.stop();
+        }
+      }
+
+      if ("IntersectionObserver" in window) {
+        var carouselObserver = new IntersectionObserver(
+          function (entries) {
+            isCarouselVisible = entries[0].isIntersecting;
+            updateCarouselMotion();
+          },
+          { rootMargin: "80px 0px", threshold: 0.05 },
+        );
+
+        carouselObserver.observe(slider);
+      } else {
+        isCarouselVisible = true;
+      }
+
+      window.addEventListener(
+        "scroll",
+        function () {
+          if (!isPageScrolling) {
+            isPageScrolling = true;
+            updateCarouselMotion();
+          }
+
+          window.clearTimeout(scrollTimer);
+          scrollTimer = window.setTimeout(function () {
+            isPageScrolling = false;
+            updateCarouselMotion();
+          }, 160);
+        },
+        { passive: true },
+      );
+
+      document.addEventListener("visibilitychange", updateCarouselMotion);
+      updateCarouselMotion();
     });
   }
 })();
