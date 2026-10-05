@@ -612,6 +612,31 @@ a {
   line-height: 1.6;
 }
 
+/* Impact figures stay prominent while their labels remain easy to scan. */
+.mt-impact-card {
+  display: flex;
+  min-height: 150px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.mt-impact-card .mt-impact-value {
+  margin-bottom: 0.85rem;
+  color: var(--mt-purple-deep);
+  font-size: clamp(42px, 4.5vw, 64px);
+  font-weight: 800;
+  letter-spacing: -0.055em;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+.mt-impact-card .mt-impact-label {
+  font-size: 1rem;
+  font-weight: 500;
+  line-height: 1.45;
+}
+
 .mt-deliver-card {
   position: relative;
   overflow: hidden;
@@ -698,12 +723,12 @@ a {
 }
 
 #faq .mt-eyebrow {
-  color: var(--mt-ink);
+  color: var(--mt-pink);
   font-family: var(--mt-font);
-  font-size: var(--mt-faq-main-size);
-  font-weight: 500;
-  letter-spacing: -0.03em;
-  text-transform: none;
+  font-size: 0.76rem;
+  font-weight: 900;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
 }
 /* Bootstrap accordion theme */
 .mt-faq {
@@ -1662,9 +1687,9 @@ a {
     display: none;
   }
   #faq .mt-eyebrow {
-    margin: 0 0 18px;
-    font-size: 24px;
-    font-weight: 500;
+    margin: 0 0 14px;
+    font-size: 12px;
+    font-weight: 900;
   }
 
   .mt-faq {

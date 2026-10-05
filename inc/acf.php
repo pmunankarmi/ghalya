@@ -222,6 +222,16 @@ function ghalya_acf_home_fields()
         ghalya_acf_plain_field('home', 'benefits_intro', __('Benefits introduction', 'ghalya'), 'textarea', array('rows' => 3, 'new_lines' => '')),
         $benefits_field,
 
+        ghalya_acf_section_tab('impact', __('Impact', 'ghalya')),
+        ghalya_acf_plain_field('home', 'impact_title', __('Impact title', 'ghalya')),
+        ghalya_acf_plain_field('home', 'impact_stats', __('Impact statistics', 'ghalya'), 'repeater', array(
+            'layout' => 'table',
+            'sub_fields' => array(
+                ghalya_acf_plain_field('home_impact', 'value', __('Value', 'ghalya')),
+                ghalya_acf_plain_field('home_impact', 'label', __('Label', 'ghalya')),
+            ),
+        )),
+
         ghalya_acf_section_tab('deliverables', __('Deliverables', 'ghalya')),
         ghalya_acf_plain_field('home', 'deliver_eyebrow', __('Deliverables eyebrow', 'ghalya')),
         ghalya_acf_plain_field('home', 'deliver_title', __('Deliverables title', 'ghalya')),

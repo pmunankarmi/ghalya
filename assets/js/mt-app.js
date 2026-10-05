@@ -300,6 +300,110 @@
     });
   }
 
+  // Count impact figures once when their cards enter the viewport.
+  var impactCounters = document.querySelectorAll("[data-mt-counter]");
+  if (impactCounters.length) {
+    var reduceCounterMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    ).matches;
+
+    function normaliseCounterDigits(value) {
+      return value
+        .replace(/[٠-٩]/g, function (digit) {
+          return String("٠١٢٣٤٥٦٧٨٩".indexOf(digit));
+        })
+        .replace(/[۰-۹]/g, function (digit) {
+          return String("۰۱۲۳۴۵۶۷۸۹".indexOf(digit));
+        });
+    }
+
+    function animateCounter(counter) {
+      if (counter.dataset.mtCounterStarted === "true") {
+        return;
+      }
+
+      counter.dataset.mtCounterStarted = "true";
+      var originalValue = counter.dataset.mtCounterValue || counter.textContent;
+      var parsedValue = normaliseCounterDigits(originalValue.trim()).match(
+        /^([^0-9]*)([0-9][0-9,.]*)(.*)$/,
+      );
+
+      if (!parsedValue || reduceCounterMotion) {
+        counter.textContent = originalValue;
+        return;
+      }
+
+      var numberText = parsedValue[2];
+      var target = Number(numberText.replace(/,/g, ""));
+      if (!Number.isFinite(target)) {
+        counter.textContent = originalValue;
+        return;
+      }
+
+      var decimalPoint = numberText.lastIndexOf(".");
+      var decimals = decimalPoint >= 0 ? numberText.length - decimalPoint - 1 : 0;
+      var hasGrouping = numberText.indexOf(",") >= 0;
+      var prefix = parsedValue[1];
+      var suffix = parsedValue[3];
+      var duration = 1400;
+      var startTime;
+
+      function formatCounterValue(value) {
+        if (hasGrouping) {
+          return value.toLocaleString("en-US", {
+            minimumFractionDigits: decimals,
+            maximumFractionDigits: decimals,
+          });
+        }
+
+        return decimals ? value.toFixed(decimals) : String(Math.round(value));
+      }
+
+      function drawCounterFrame(timestamp) {
+        if (!startTime) {
+          startTime = timestamp;
+        }
+
+        var progress = Math.min((timestamp - startTime) / duration, 1);
+        var easedProgress = 1 - Math.pow(1 - progress, 3);
+        var currentValue = target * easedProgress;
+        counter.textContent =
+          prefix + formatCounterValue(currentValue) + suffix;
+
+        if (progress < 1) {
+          window.requestAnimationFrame(drawCounterFrame);
+        } else {
+          counter.textContent = originalValue;
+        }
+      }
+
+      counter.textContent = prefix + formatCounterValue(0) + suffix;
+      window.requestAnimationFrame(drawCounterFrame);
+    }
+
+    if ("IntersectionObserver" in window && !reduceCounterMotion) {
+      var impactObserver = new IntersectionObserver(
+        function (entries) {
+          entries.forEach(function (entry) {
+            if (entry.isIntersecting) {
+              animateCounter(entry.target);
+              impactObserver.unobserve(entry.target);
+            }
+          });
+        },
+        { threshold: 0.35 },
+      );
+
+      impactCounters.forEach(function (counter) {
+        impactObserver.observe(counter);
+      });
+    } else {
+      impactCounters.forEach(function (counter) {
+        animateCounter(counter);
+      });
+    }
+  }
+
   // Validate each application step before opening the next page.
   if (
     typeof window.jQuery !== "undefined" &&

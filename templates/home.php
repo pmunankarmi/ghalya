@@ -19,6 +19,7 @@ get_header();
   <?php get_template_part('template-parts/home/hero', null, $section_args); ?>
   <?php get_template_part('template-parts/home/partners', null, $section_args); ?>
   <?php get_template_part('template-parts/home/benefits', null, $section_args); ?>
+  <?php get_template_part('template-parts/home/impact', null, $section_args); ?>
   <?php get_template_part('template-parts/home/deliverables', null, $section_args); ?>
   <?php get_template_part('template-parts/home/eligibility', null, $section_args); ?>
   <?php get_template_part('template-parts/home/faq', null, $section_args); ?>
