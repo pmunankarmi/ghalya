@@ -98,6 +98,10 @@ function ghalya_application_is_complete($application, $language, $email, $phone)
         }
     }
 
+    if (!preg_match('/^@[A-Za-z0-9._]{1,30}$/', (string) $profile['instagram'])) {
+        return false;
+    }
+
     foreach ($work_fields as $field) {
         if (empty($work[$field])) {
             return false;

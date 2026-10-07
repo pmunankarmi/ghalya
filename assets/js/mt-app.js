@@ -412,6 +412,16 @@
     var $ = window.jQuery;
     var isArabic = document.documentElement.lang === "ar";
 
+    $.validator.addMethod(
+      "instagramHandle",
+      function (value, element) {
+        return this.optional(element) || /^@[A-Za-z0-9._]{1,30}$/.test(value);
+      },
+      isArabic
+        ? "يرجى إدخال اسم مستخدم إنستغرام صحيح يبدأ بعلامة @."
+        : "Enter a valid Instagram handle beginning with @.",
+    );
+
     if (isArabic) {
       $.extend($.validator.messages, {
         required: "هذا الحقل مطلوب.",
@@ -423,6 +433,11 @@
 
     $(".mt-js-form").each(function () {
       $(this).validate({
+        rules: {
+          instagram: {
+            instagramHandle: true,
+          },
+        },
         errorClass: "mt-field-error",
         validClass: "mt-field-valid",
         errorElement: "span",

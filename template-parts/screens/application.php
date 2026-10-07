@@ -88,7 +88,7 @@ if ($tier_label !== '') {
             <div class="col-md-6">
               <div class="mt-field">
                 <label class="mt-label" for="instagram"><?php echo esc_html(ghalya_content_text($content, 'instagram_label')); ?></label>
-                <input class="mt-input" id="instagram" name="instagram" required type="text" placeholder="<?php echo esc_attr(ghalya_content_text($content, 'instagram_placeholder')); ?>" />
+                <input class="mt-input" id="instagram" name="instagram" required type="text" pattern="@[A-Za-z0-9._]{1,30}" maxlength="31" autocapitalize="none" spellcheck="false" placeholder="<?php echo esc_attr(ghalya_content_text($content, 'instagram_placeholder')); ?>" />
               </div>
             </div>
           </div>
