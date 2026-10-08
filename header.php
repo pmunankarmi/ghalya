@@ -2,12 +2,25 @@
 $ghalya_language = ghalya_current_language();
 $ghalya_screen = ghalya_current_screen();
 $ghalya_is_landing = $ghalya_screen === 'home';
+$ghalya_nav_sources = array('benefits' => 'Benefits', 'faqs' => 'FAQs', 'terms' => 'Terms');
+$ghalya_nav_arabic = array('benefits' => 'المزايا', 'faqs' => 'الأسئلة الشائعة', 'terms' => 'الشروط');
+$ghalya_nav_labels = array();
+
+foreach ($ghalya_nav_sources as $ghalya_nav_key => $ghalya_nav_source) {
+    $ghalya_nav_label = function_exists('pll__') ? pll__($ghalya_nav_source) : __($ghalya_nav_source, 'ghalya');
+
+    if ($ghalya_language === 'ar' && $ghalya_nav_label === $ghalya_nav_source) {
+        $ghalya_nav_label = $ghalya_nav_arabic[$ghalya_nav_key];
+    }
+
+    $ghalya_nav_labels[$ghalya_nav_key] = $ghalya_nav_label;
+}
 ?>
 <!doctype html>
 <html lang="<?php echo esc_attr($ghalya_language); ?>" dir="<?php echo $ghalya_language === 'ar' ? 'rtl' : 'ltr'; ?>">
   <head>
     <meta charset="<?php bloginfo('charset'); ?>" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <?php wp_head(); ?>
   </head>
   <body <?php body_class(); ?>>
@@ -15,18 +28,30 @@ $ghalya_is_landing = $ghalya_screen === 'home';
     <header class="mt-site-header">
       <nav class="navbar<?php echo $ghalya_is_landing ? ' navbar-expand-lg' : ''; ?>">
         <div class="container">
-          <a class="mt-brand" href="<?php echo esc_url(ghalya_page_url('home', $ghalya_language)); ?>" aria-label="<?php esc_attr_e('Ghalya home', 'ghalya'); ?>">
-            <img src="<?php echo esc_url(GHALYA_THEME_URI . '/assets/images/ghalya-logo.png'); ?>" alt="Ghalya" />
+          <a class="mt-brand" href="<?php echo esc_url(ghalya_page_url('home', $ghalya_language)); ?>" aria-label="<?php echo esc_attr(get_bloginfo('name')); ?>">
+            <?php
+            $ghalya_logo_id = get_theme_mod('custom_logo');
+
+            if ($ghalya_logo_id) {
+                echo wp_get_attachment_image($ghalya_logo_id, 'full', false, array(
+                    'class' => 'custom-logo',
+                    'alt' => get_bloginfo('name'),
+                ));
+            } else {
+                ?>
+                <img src="<?php echo esc_url(ghalya_asset_url('images/ghalya-logo.png')); ?>" alt="<?php echo esc_attr(get_bloginfo('name')); ?>" />
+                <?php
+            }
+            ?>
           </a>
           <div class="d-flex align-items-center <?php echo $ghalya_is_landing ? 'gap-4' : 'gap-3'; ?>">
             <?php if ($ghalya_is_landing) : ?>
-              <a class="mt-nav-link d-none d-md-inline" href="#benefits"><?php echo $ghalya_language === 'ar' ? 'المزايا' : 'Benefits'; ?></a>
-              <a class="mt-nav-link d-none d-md-inline" href="#faq"><?php echo $ghalya_language === 'ar' ? 'الأسئلة الشائعة' : 'FAQs'; ?></a>
+              <a class="mt-nav-link d-none d-md-inline" href="#benefits"><?php echo esc_html($ghalya_nav_labels['benefits']); ?></a>
+              <a class="mt-nav-link d-none d-md-inline" href="#faq"><?php echo esc_html($ghalya_nav_labels['faqs']); ?></a>
             <?php endif; ?>
-            <a class="mt-nav-link d-none d-sm-inline" href="<?php echo esc_url(ghalya_page_url('terms', $ghalya_language)); ?>"><?php echo $ghalya_language === 'ar' ? 'الشروط' : 'Terms'; ?></a>
-            <a class="mt-lang-link" href="<?php echo esc_url(ghalya_language_switch_url()); ?>"><?php echo $ghalya_language === 'ar' ? 'English' : 'العربية'; ?></a>
+            <a class="mt-nav-link d-none d-sm-inline" href="<?php echo esc_url(ghalya_page_url('terms', $ghalya_language)); ?>"><?php echo esc_html($ghalya_nav_labels['terms']); ?></a>
+            <a class="mt-lang-link" href="<?php echo esc_url(ghalya_language_switch_url()); ?>"><?php echo esc_html(ghalya_language_switch_name()); ?></a>
           </div>
         </div>
       </nav>
     </header>
-
