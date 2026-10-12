@@ -1,0 +1,44 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: Ghalya Creator Program 1.4.6\n"
+"PO-Revision-Date: 2026-09-28 00:00+0545\n"
+"Last-Translator: Prime Digital\n"
+"Language-Team: Arabic\n"
+"Language: ar\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=11 && n%100<=99 ? 4 : 5;\n"
+"X-Domain: ghalya\n"
+
+#: header.php
+msgid "Benefits"
+msgstr "المزايا"
+
+#: header.php
+msgid "FAQs"
+msgstr "الأسئلة الشائعة"
+
+#: header.php
+msgid "Terms"
+msgstr "الشروط"
+
+#: inc/helpers.php
+msgid "Previous"
+msgstr "السابق"
+
+#: inc/helpers.php
+msgid "Back"
+msgstr "رجوع"
+
+#: inc/helpers.php
+msgid "Continue"
+msgstr "متابعة"
+
+#: inc/helpers.php
+msgid "Submit application"
+msgstr "تقديم الطلب"
+
+#: template-parts/screens/application.php
+msgid "Step %1$d of %2$d"
+msgstr "الخطوة %1$d من %2$d"

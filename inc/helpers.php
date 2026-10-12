@@ -36,7 +36,7 @@ function ghalya_current_screen()
     }
 
     $screen = get_post_meta(get_queried_object_id(), '_ghalya_screen', true);
-    $allowed = array('home', 'profile', 'tier', 'work', 'proposal', 'contact', 'success', 'terms');
+    $allowed = array('home', 'join', 'profile', 'tier', 'work', 'proposal', 'contact', 'success', 'terms');
 
     return in_array($screen, $allowed, true) ? $screen : 'home';
 }
@@ -58,7 +58,7 @@ function ghalya_page_url($screen, $language = '')
         return home_url('/');
     }
 
-    $slug = $screen . ($language === 'ar' ? '-ar' : '');
+    $slug = $screen;
     return home_url('/' . $slug . '/');
 }
 
@@ -79,6 +79,30 @@ function ghalya_language_switch_url()
     }
 
     return ghalya_page_url(ghalya_current_screen(), $other_language);
+}
+
+/** Return Polylang's configured native name for the other language. */
+function ghalya_language_switch_name()
+{
+    $other_language = ghalya_current_language() === 'ar' ? 'en' : 'ar';
+
+    if (function_exists('pll_the_languages')) {
+        $languages = pll_the_languages(array(
+            'raw' => 1,
+            'hide_if_empty' => 0,
+            'hide_if_no_translation' => 0,
+        ));
+
+        if (is_array($languages)) {
+            foreach ($languages as $language) {
+                if (($language['slug'] ?? '') === $other_language && !empty($language['name'])) {
+                    return (string) $language['name'];
+                }
+            }
+        }
+    }
+
+    return $other_language === 'ar' ? 'العربية' : 'English';
 }
 
 /**
@@ -114,145 +138,176 @@ function ghalya_body_classes($classes)
 }
 add_filter('body_class', 'ghalya_body_classes');
 
-/**
- * Apply optional ACF landing-page copy while retaining the supplied defaults.
- */
-function ghalya_apply_landing_fields($content)
+/** Populate structured ACF fields once without overwriting later admin edits. */
+function ghalya_seed_page_content($page_id, $screen, $language)
 {
-    if (!function_exists('get_field')) {
-        return $content;
+    $seed_key = '_ghalya_plain_content_seeded_' . $screen;
+
+    if (get_post_meta($page_id, $seed_key, true) || !function_exists('update_field')) {
+        return false;
     }
 
-    $title = trim((string) get_field('ghalya_hero_title'));
-    $accent = trim((string) get_field('ghalya_hero_accent'));
-    $copy = trim((string) get_field('ghalya_hero_copy'));
-    $button = trim((string) get_field('ghalya_join_label'));
+    $existing_content = function_exists('get_field') ? get_field('ghalya_' . $screen . '_content', $page_id) : false;
 
-    if ($title !== '') {
-        $heading = esc_html($title);
-
-        if ($accent !== '') {
-            $heading .= ' <span class="mt-accent">' . esc_html($accent) . '</span>';
-        }
-
-        $content = preg_replace_callback(
-            '~(<h1 class="mt-(?:mobile-title|hero-title)">).*?(</h1>)~s',
-            function ($matches) use ($heading) {
-                return $matches[1] . $heading . $matches[2];
-            },
-            $content
-        );
+    if (is_array($existing_content) && array_filter($existing_content)) {
+        update_post_meta($page_id, $seed_key, GHALYA_THEME_VERSION);
+        return false;
     }
 
-    if ($copy !== '') {
-        $safe_copy = esc_html($copy);
-        $content = preg_replace_callback(
-            '~(<p class="mt-(?:mobile-copy|hero-copy)">).*?(</p>)~s',
-            function ($matches) use ($safe_copy) {
-                return $matches[1] . $safe_copy . $matches[2];
-            },
-            $content
-        );
+    $content = ghalya_default_content($screen, $language);
+
+    if (!$content) {
+        return false;
     }
 
-    if ($button !== '') {
-        $safe_button = esc_html($button);
-        $content = preg_replace_callback(
-            '~(<a\b[^>]*class="[^"]*mt-community-join[^"]*"[^>]*>).*?(</a>)~s',
-            function ($matches) use ($safe_button) {
-                return $matches[1] . $safe_button . $matches[2];
-            },
-            $content
-        );
-    }
+    update_field('field_ghalya_' . $screen . '_content', $content, $page_id);
+    update_post_meta($page_id, $seed_key, GHALYA_THEME_VERSION);
 
-    return $content;
+    return true;
 }
 
-/**
- * Render the matching static view through WordPress URLs and security fields.
- */
-function ghalya_render_screen($screen)
+function ghalya_content_text($content, $key)
 {
-    $language = ghalya_current_language();
-    $source_name = $screen === 'home' ? 'index' : $screen;
-    $source_name .= $language === 'ar' ? '-ar.html' : '.html';
-    $source_path = GHALYA_THEME_PATH . '/views/' . $source_name;
+    return isset($content[$key]) && !is_array($content[$key]) ? (string) $content[$key] : '';
+}
 
-    if (!is_readable($source_path)) {
-        echo '<main class="mt-form-page"><div class="container"><p>';
-        esc_html_e('This page could not be loaded.', 'ghalya');
-        echo '</p></div></main>';
-        return;
+function ghalya_content_rows($content, $key)
+{
+    return isset($content[$key]) && is_array($content[$key]) ? $content[$key] : array();
+}
+
+/** Match the selected follower range to the tier in the same list position. */
+function ghalya_assigned_tier($language, $application = array(), $tiers = array())
+{
+    if (!function_exists('get_field')) {
+        return array();
     }
 
-    $source = file_get_contents($source_path);
+    $language = in_array($language, array('en', 'ar'), true) ? $language : 'en';
+    $page_ids = get_option('ghalya_page_ids', array());
 
-    if (!preg_match('~<main\b[^>]*>.*?</main>~s', $source, $matches)) {
-        return;
+    if (!$tiers) {
+        $home_id = isset($page_ids[$language]['home']) ? absint($page_ids[$language]['home']) : 0;
+        $home_content = $home_id ? get_field('ghalya_home_content', $home_id) : array();
+        $tiers = is_array($home_content) ? ghalya_content_rows($home_content, 'tiers') : array();
     }
 
-    $content = $matches[0];
-    $asset_url = GHALYA_THEME_URI . '/assets/';
-    $content = str_replace(
-        array('src="assets/', 'href="assets/'),
-        array('src="' . esc_url($asset_url), 'href="' . esc_url($asset_url)),
-        $content
+    if (!$tiers) {
+        return array();
+    }
+
+    $profile_id = isset($page_ids[$language]['profile']) ? absint($page_ids[$language]['profile']) : 0;
+    $profile_content = $profile_id ? get_field('ghalya_profile_content', $profile_id) : array();
+
+    if (!is_array($profile_content) || !$profile_content) {
+        $profile_content = ghalya_default_content('profile', $language);
+    }
+
+    $profile_key = $language . ':mt-step-1';
+    $profile = isset($application[$profile_key]) && is_array($application[$profile_key]) ? $application[$profile_key] : array();
+    $followers = sanitize_text_field((string) ($profile['followers'] ?? ''));
+
+    foreach (ghalya_content_rows($profile_content, 'followers_choices') as $index => $choice) {
+        if ($followers !== '' && $followers === (string) ($choice['value'] ?? '') && isset($tiers[$index])) {
+            return $tiers[$index];
+        }
+    }
+
+    foreach ($tiers as $tier) {
+        if (!empty($tier['active'])) {
+            return $tier;
+        }
+    }
+
+    return reset($tiers);
+}
+
+/** Fetch the direct application pages beneath the translated Join parent. */
+function ghalya_application_pages($language = '')
+{
+    $language = in_array($language, array('en', 'ar'), true) ? $language : ghalya_current_language();
+    $page_ids = get_option('ghalya_page_ids', array());
+    $join_id = isset($page_ids[$language]['join']) ? absint($page_ids[$language]['join']) : 0;
+
+    if ($join_id) {
+        $pages = get_pages(array(
+            'parent' => $join_id,
+            'post_status' => 'publish',
+            'sort_column' => 'menu_order,post_title',
+            'sort_order' => 'ASC',
+        ));
+
+        if ($pages) {
+            return $pages;
+        }
+    }
+
+    // Keep the progress list available until an older installation is upgraded.
+    $pages = array();
+
+    foreach (array('profile', 'tier', 'work', 'proposal', 'contact') as $screen) {
+        $page_id = isset($page_ids[$language][$screen]) ? absint($page_ids[$language][$screen]) : 0;
+
+        if ($page_id && get_post_status($page_id)) {
+            $pages[] = get_post($page_id);
+        }
+    }
+
+    return array_filter($pages);
+}
+
+/** Return shared sidebar copy from the translated Join parent page. */
+function ghalya_join_content($language = '')
+{
+    $language = in_array($language, array('en', 'ar'), true) ? $language : ghalya_current_language();
+    $page_ids = get_option('ghalya_page_ids', array());
+    $join_id = isset($page_ids[$language]['join']) ? absint($page_ids[$language]['join']) : 0;
+    $content = array();
+
+    if ($join_id && function_exists('get_field')) {
+        $content = get_field('ghalya_join_content', $join_id);
+    }
+
+    return is_array($content) && $content ? $content : ghalya_default_content('join', $language);
+}
+
+/** Use Polylang's editable application labels with bundled fallbacks. */
+function ghalya_application_label($key)
+{
+    $labels = array(
+        'previous' => array('source' => 'Previous', 'fallback' => __('Previous', 'ghalya')),
+        'back' => array('source' => 'Back', 'fallback' => __('Back', 'ghalya')),
+        'continue' => array('source' => 'Continue', 'fallback' => __('Continue', 'ghalya')),
+        'submit' => array('source' => 'Submit application', 'fallback' => __('Submit application', 'ghalya')),
     );
 
-    $screens = array('index' => 'home', 'profile' => 'profile', 'tier' => 'tier', 'work' => 'work', 'proposal' => 'proposal', 'contact' => 'contact', 'success' => 'success', 'terms' => 'terms');
-
-    foreach ($screens as $file_name => $target_screen) {
-        foreach (array('en', 'ar') as $target_language) {
-            $static_file = $file_name . ($target_language === 'ar' ? '-ar' : '') . '.html';
-            $target_url = esc_url(ghalya_page_url($target_screen, $target_language));
-
-            $content = str_replace(
-                array(
-                    'href="' . $static_file . '"',
-                    'action="' . $static_file . '"',
-                    'data-mt-next="' . $static_file . '"',
-                ),
-                array(
-                    'href="' . $target_url . '"',
-                    'action="' . $target_url . '"',
-                    'data-mt-next="' . $target_url . '"',
-                ),
-                $content
-            );
-        }
+    if (!isset($labels[$key])) {
+        return '';
     }
 
-    if ($screen === 'contact') {
-        $content = str_replace(
-            'action="sendmail.php"',
-            'action="' . esc_url(admin_url('admin-post.php')) . '"',
-            $content
-        );
+    $source = $labels[$key]['source'];
+    $fallback = $labels[$key]['fallback'];
 
-        $security_fields = '<input type="hidden" name="action" value="ghalya_submit_application">';
-        $security_fields .= wp_nonce_field('ghalya_submit_application', '_ghalya_nonce', true, false);
-
-        $content = preg_replace_callback(
-            '~<form\b(?=[^>]*\bdata-mt-sendmail\b)[^>]*>~s',
-            function ($form_match) use ($security_fields) {
-                return $form_match[0] . $security_fields;
-            },
-            $content,
-            1
-        );
-
-        if (!empty($_GET['submission_error'])) {
-            $message = ghalya_submission_error_message(sanitize_key(wp_unslash($_GET['submission_error'])));
-            $notice = '<div class="container"><div class="mt-form-card mt-submission-notice" role="alert">' . esc_html($message) . '</div></div>';
-            $content = preg_replace('~(<main\b[^>]*>)~', '$1' . $notice, $content, 1);
-        }
+    if (!function_exists('pll__')) {
+        return $fallback;
     }
 
-    if ($screen === 'home') {
-        $content = ghalya_apply_landing_fields($content);
+    $translated = pll__($source);
+
+    if ($translated === $source && ghalya_current_language() !== 'en') {
+        return $fallback;
     }
 
-    // The view is maintained by the theme and all dynamic values were escaped above.
-    echo $content; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+    return $translated;
+}
+
+function ghalya_asset_url($path)
+{
+    $path = ltrim($path, '/');
+
+    if (strpos($path, 'images/') === 0) {
+        return ghalya_media_url(substr($path, 7));
+    }
+
+    return GHALYA_THEME_URI . '/assets/' . $path;
 }
