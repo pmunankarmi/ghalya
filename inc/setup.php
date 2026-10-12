@@ -64,10 +64,11 @@ function ghalya_enqueue_assets()
     $is_arabic = ghalya_current_language() === 'ar';
     $bootstrap_file = $is_arabic ? 'bootstrap.rtl.min.css' : 'bootstrap.min.css';
 
+    wp_enqueue_style('ghalya-fonts', 'https://fonts.googleapis.com/css2?family=Akshar:wght@300..700&family=Alexandria:wght@100..900&display=swap', array(), null);
     wp_enqueue_style('ghalya-bootstrap', GHALYA_THEME_URI . '/assets/vendor/' . $bootstrap_file, array(), '5.3.3');
     wp_enqueue_style('ghalya-aos', GHALYA_THEME_URI . '/assets/vendor/aos.css', array(), '2.3.4');
     wp_enqueue_style('ghalya-swiper', GHALYA_THEME_URI . '/assets/vendor/swiper-bundle.min.css', array(), '12.0.3');
-    wp_enqueue_style('ghalya-theme', GHALYA_THEME_URI . '/assets/css/mt-style.css', array('ghalya-bootstrap'), filemtime(GHALYA_THEME_PATH . '/assets/css/mt-style.css'));
+    wp_enqueue_style('ghalya-theme', GHALYA_THEME_URI . '/assets/css/mt-style.css', array('ghalya-bootstrap', 'ghalya-fonts'), filemtime(GHALYA_THEME_PATH . '/assets/css/mt-style.css'));
 
     ghalya_enqueue_media_styles();
 

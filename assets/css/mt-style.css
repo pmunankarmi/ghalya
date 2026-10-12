@@ -1,12 +1,3 @@
-/* Local typefaces */
-@font-face {
-  font-family: "MT Lexend";
-  src: url("../fonts/Lexend-Regular.ttf") format("truetype");
-  font-style: normal;
-  font-weight: 400;
-  font-display: swap;
-}
-
 /* Submission feedback returned by the WordPress form handler. */
 .mt-submission-notice {
   margin-bottom: 24px;
@@ -38,86 +29,6 @@
   transform: translate3d(0, 24px, 0);
 }
 
-@font-face {
-  font-family: "MT Lexend";
-  src: url("../fonts/Lexend-Light.woff2") format("woff2");
-  font-style: normal;
-  font-weight: 300;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: "MT Lexend";
-  src: url("../fonts/Lexend-Medium.ttf") format("truetype");
-  font-style: normal;
-  font-weight: 500;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: "MT Lexend";
-  src: url("../fonts/Lexend-SemiBold.ttf") format("truetype");
-  font-style: normal;
-  font-weight: 600;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: "MT Lexend";
-  src: url("../fonts/Lexend-Bold.ttf") format("truetype");
-  font-style: normal;
-  font-weight: 700;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: "MT Lexend";
-  src: url("../fonts/Lexend-ExtraBold.ttf") format("truetype");
-  font-style: normal;
-  font-weight: 800 900;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: "MT Gotham Rounded";
-  src: url("../fonts/GothamRounded-Book.otf") format("opentype");
-  font-style: normal;
-  font-weight: 400;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: "MT Gotham Rounded";
-  src: url("../fonts/GothamRounded-Medium.otf") format("opentype");
-  font-style: normal;
-  font-weight: 600;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: "MT Gotham Rounded";
-  src: url("../fonts/GothamRounded-Bold.otf") format("opentype");
-  font-style: normal;
-  font-weight: 700 900;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: "MT Graphik Arabic";
-  src: url("../fonts/GraphikArabic-Regular.otf") format("opentype");
-  font-style: normal;
-  font-weight: 400 600;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: "MT Graphik Arabic";
-  src: url("../fonts/GraphikArabic-Bold.otf") format("opentype");
-  font-style: normal;
-  font-weight: 700 900;
-  font-display: swap;
-}
-
 /* Shared design tokens */
 :root {
   --mt-ink: #000000;
@@ -137,8 +48,8 @@
   --mt-radius-sm: 14px;
   --mt-radius-md: 22px;
   --mt-radius-lg: 34px;
-  --mt-font: "MT Lexend", Arial, sans-serif;
-  --mt-font-ar: "MT Graphik Arabic", "SF Arabic", Arial, sans-serif;
+  --mt-font: "Akshar", Arial, sans-serif;
+  --mt-font-ar: "Alexandria", "SF Arabic", Arial, sans-serif;
   --mt-faq-main-size: 32px;
   --mt-faq-title-size: 18px;
   --mt-faq-body-size: 15px;
